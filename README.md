@@ -19,7 +19,7 @@ Hiện nay, bộ phận nhân sự tại nhiều doanh nghiệp vẫn thực hi�
 
 ---
 
-## 🛠️ 2. Nền tảng Kỹ thuật (Tech Stack)
+##  2. Nền tảng Kỹ thuật (Tech Stack)
 
 | Tầng (Layer) | Công nghệ / Công cụ | Mô tả & Lý do lựa chọn |
 | :--- | :--- | :--- |
@@ -32,7 +32,7 @@ Hiện nay, bộ phận nhân sự tại nhiều doanh nghiệp vẫn thực hi�
 
 ---
 
-## 👥 3. Các Vai trò Người dùng (7 User Roles)
+##  3. Các Vai trò Người dùng (7 User Roles)
 
 1. **Candidate (Ứng viên):** Tìm kiếm vị trí, nộp CV, tra cứu trạng thái hồ sơ và phản hồi Offer.
 2. **Recruiter (Nhân viên tuyển dụng):** Sàng lọc CV, điều phối Pipeline Kanban, đặt lịch phỏng vấn, tạo Offer.
