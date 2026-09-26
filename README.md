@@ -232,16 +232,6 @@ User Story chỉ được xem là hoàn thành khi:
 - `fix/<story-id>-<description>`: Sửa lỗi.
 - `test/<story-id>-<description>`: Công việc kiểm thử.
 
-Ví dụ:
-
-```text
-main
-develop
-feature/S1-01-login-ui
-feature/S1-01-login-api
-test/S1-01-login
-```
-
 ### Quy trình làm việc
 
 1. Nhận User Story/Sub-task trên Jira và đọc Description cùng Acceptance Criteria.
