@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="cyber">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KN-52 | Cyber Security Role Assignment - Lường Thị Giang</title>
+    <!-- Fonts Orbitron & Rajdhani for Cyberpunk Aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="cyber-grid-bg">
+    <!-- Neon Top Navbar -->
+    <header class="cyber-header">
+      <div class="header-inner">
+        <div class="cyber-brand">
+          <div class="brand-hexagon">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div class="brand-info">
+            <h1 class="glitch-text" data-text="CYBER ACCESS CONTROL">
+              CYBER ACCESS CONTROL
+            </h1>
+            <span class="cyber-badge-ticket"
+              ><i class="fa-solid fa-microchip"></i> KN-52 MATRIX</span
+            >
+          </div>
+        </div>
+
+        <!-- Author & Theme Controls -->
+        <div class="cyber-nav-right">
+          <button
+            id="layoutToggleBtn"
+            class="cyber-btn cyber-btn-outline"
+            title="Chuyển chế độ xem Dạng Thẻ / Dạng Bảng Chuyển Đổi"
+          >
+            <i class="fa-solid fa-right-left"></i> Chế Độ Transfer Box
+          </button>
+          <div class="cyber-user-pill">
+            <div class="avatar-ring">
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' fill='%23111726' rx='64'/%3E%3Cpath d='M64 24a24 24 0 1 0 0 48 24 24 0 0 0 0-48zM32 104c0-17.7 14.3-32 32-32s32 14.3 32 32' fill='none' stroke='%2300F0FF' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E"
+                alt="Lường Thị Giang"
+                class="hologram-avatar"
+              />
+              <span class="online-pulse"></span>
+            </div>
+            <div class="author-details">
+              <span class="author-name">Lường Thị Giang</span>
+              <span class="author-title">Root Cyber Administrator</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="cyber-container">
+      <!-- Top Status Gauge & HUD Overview -->
+      <div class="hud-overview-bar">
+        <div class="hud-stat-box">
+          <div class="stat-icon-wrap icon-cyan">
+            <i class="fa-solid fa-users-viewfinder"></i>
+          </div>
+          <div>
+            <div class="hud-stat-val" id="totalUsersNum">5</div>
+            <div class="hud-stat-lbl">Tài khoản hệ thống</div>
+          </div>
+        </div>
+        <div class="hud-stat-box">
+          <div class="stat-icon-wrap icon-magenta">
+            <i class="fa-solid fa-key"></i>
+          </div>
+          <div>
+            <div class="hud-stat-val" id="totalRolesNum">8</div>
+            <div class="hud-stat-lbl">Vai trò phân quyền</div>
+          </div>
+        </div>
+
+        <!-- ACCESS LEVEL GAUGE & SELECTED COUNT (KEY REQUIREMENT 6) -->
+        <div class="hud-stat-box gauge-box highlight-neon">
+          <div class="gauge-ring-wrap">
+            <svg class="gauge-svg" viewBox="0 0 36 36">
+              <path
+                class="circle-bg"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              />
+              <path
+                class="circle-fill"
+                id="gaugeCirclePath"
+                stroke-dasharray="50, 100"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              />
+            </svg>
+            <span class="gauge-percentage" id="accessPercentText">50%</span>
+          </div>
+          <div>
+            <!-- SELECTION COUNTER BADGE -->
+            <div class="cyber-counter-badge" id="cyberCounterBadge">
+              Đã chọn: <strong id="selectedRoleCount">4</strong> /
+              <span id="maxAvailableRoles">8</span> vai trò
+            </div>
+            <div class="hud-stat-lbl">Access Coverage Metrics</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two Column Main Layout -->
+      <div class="cyber-grid">
+        <!-- LEFT SIDEBAR: USER SELECTION (REQUIREMENT 1) -->
+        <aside class="cyber-panel panel-left">
+          <div class="panel-cyber-header">
+            <h3>
+              <i class="fa-solid fa-user-shield text-cyan"></i> 1. CHỌN NGƯỜI
+              DÙNG
+            </h3>
+            <span class="corner-cut"></span>
+          </div>
+
+          <div class="panel-cyber-body">
+            <!-- Custom Cyber Select Dropdown -->
+            <div class="field-wrap">
+              <label for="cyberUserSelect" class="field-label"
+                ><i class="fa-solid fa-crosshairs"></i> Chọn tài khoản
+                target:</label
+              >
+              <select id="cyberUserSelect" class="cyber-select">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <!-- Selected User HUD Profile Card -->
+            <div class="user-hud-card" id="userHudCard">
+              <div class="user-hud-top">
+                <img
+                  id="hudAvatar"
+                  src=""
+                  alt="User Avatar"
+                  class="hud-avatar-img"
+                />
+                <div class="user-hud-meta">
+                  <h4 id="hudName">--</h4>
+                  <span id="hudEmail">--</span>
+                  <div class="hud-tags">
+                    <span id="hudDept" class="hud-dept-tag">--</span>
+                    <span id="hudStatus" class="hud-status-tag">--</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hud-divider"></div>
+
+              <!-- User's Saved DB Roles -->
+              <div class="user-saved-roles">
+                <div class="roles-label-row">
+                  <span>Vai trò đang có trong DB:</span>
+                  <span id="savedRolesCountTag" class="neon-pill"
+                    >0 vai trò</span
+                  >
+                </div>
+                <div id="savedRolesContainer" class="saved-roles-cloud">
+                  <!-- Dynamic saved role badges -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Cyber Presets -->
+            <div class="presets-section">
+              <span class="presets-title"
+                ><i class="fa-solid fa-wand-magic-sparkles"></i> Phân quyền
+                nhanh (Presets):</span
+              >
+              <div class="preset-buttons">
+                <button class="preset-btn" data-preset="admin">
+                  <i class="fa-solid fa-shield-cat text-magenta"></i> Full Admin
+                </button>
+                <button class="preset-btn" data-preset="manager">
+                  <i class="fa-solid fa-user-tie text-cyan"></i> Manager
+                </button>
+                <button class="preset-btn" data-preset="developer">
+                  <i class="fa-solid fa-code text-emerald"></i> Dev Team
+                </button>
+                <button class="preset-btn" data-preset="viewer">
+                  <i class="fa-solid fa-eye text-amber"></i> Read Only
+                </button>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- RIGHT PANEL: MULTI-ROLE ASSIGNMENT MATRIX (REQUIREMENTS 2, 3, 4, 5, 6) -->
+        <section class="cyber-panel panel-right">
+          <div class="panel-cyber-header flex-between">
+            <div>
+              <h3>
+                <i class="fa-solid fa-cubes-stacked text-magenta"></i> 2. DANH
+                SÁCH VAI TRÒ & CHỌN NHIỀU
+              </h3>
+              <p class="cyber-subtitle">
+                Tích chọn hoặc toggle các vai trò để gán quyền tương ứng
+              </p>
+            </div>
+
+            <!-- BULK ACTION BUTTONS -->
+            <div class="bulk-actions">
+              <button id="btnSelectAll" class="cyber-btn cyber-btn-sm">
+                <i class="fa-solid fa-check-double"></i> Chọn tất cả
+              </button>
+              <button
+                id="btnDeselectAll"
+                class="cyber-btn cyber-btn-sm cyber-btn-outline"
+              >
+                <i class="fa-regular fa-square"></i> Bỏ chọn tất cả
+              </button>
+            </div>
+          </div>
+
+          <div class="panel-cyber-body">
+            <!-- Search & Category Filters -->
+            <div class="filter-cyber-bar">
+              <div class="cyber-search-box">
+                <i class="fa-solid fa-magnifying-glass search-cyber-icon"></i>
+                <input
+                  type="text"
+                  id="cyberSearchInput"
+                  placeholder="Tìm kiếm vai trò theo tên, mã hoặc quyền hạn..."
+                  class="cyber-search-input"
+                />
+              </div>
+
+              <div class="cyber-tabs" id="cyberTabs">
+                <button class="cyber-tab active" data-cat="all">
+                  Tất cả (<span id="countAll">8</span>)
+                </button>
+                <button class="cyber-tab" data-cat="system">
+                  Hệ thống (<span id="countSystem">2</span>)
+                </button>
+                <button class="cyber-tab" data-cat="operation">
+                  Vận hành (<span id="countOp">3</span>)
+                </button>
+                <button class="cyber-tab" data-cat="audit">
+                  Kiểm soát (<span id="countAudit">3</span>)
+                </button>
+              </div>
+            </div>
+
+            <!-- ROLES CYBER GRID (MULTI-SELECTION CARDS) -->
+            <div class="cyber-roles-grid" id="cyberRolesGrid">
+              <!-- Dynamic role cards populated by app.js -->
+            </div>
+          </div>
+
+          <!-- STICKY ACTION FOOTER (REQUIREMENTS 4 & 5) -->
+          <div class="panel-cyber-footer">
+            <div class="footer-status-info">
+              <i class="fa-solid fa-microchip text-cyan"></i>
+              <span id="cyberFooterStatus"
+                >Đang cấu hình phân quyền cho tài khoản target...</span
+              >
+            </div>
+
+            <div class="footer-buttons">
+              <!-- REQUIREMENT 5: CANCEL BUTTON (Nút Hủy) -->
+              <button id="btnCancelCyber" class="cyber-btn cyber-btn-cancel">
+                <i class="fa-solid fa-xmark"></i> Hủy thay đổi
+              </button>
+
+              <!-- REQUIREMENT 4: ASSIGN ROLES BUTTON (Nút Gán vai trò) -->
+              <button
+                id="btnAssignCyber"
+                class="cyber-btn cyber-btn-assign glow-effect"
+              >
+                <i class="fa-solid fa-bolt"></i> GÁN VAI TRÒ
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div class="cyber-toast-container" id="cyberToastContainer"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

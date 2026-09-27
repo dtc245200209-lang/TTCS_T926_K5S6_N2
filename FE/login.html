@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trang Đăng Nhập</title>
+    <script src="auth.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background: #f4f5f7;
+      }
+      .login-card {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 360px;
+        width: 90%;
+      }
+      button {
+        padding: 10px 20px;
+        background: #0052cc;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      button:hover {
+        background: #0065ff;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-card">
+      <h2>Đăng Nhập Hệ Thống</h2>
+      <p>Bấm nút bên dưới để giả lập đăng nhập thành công:</p>
+      <button onclick="fakeLogin()">Đăng Nhập</button>
+    </div>
+
+    <script>
+      function fakeLogin() {
+        localStorage.setItem("accessToken", "test_token_123456");
+        window.location.href = "index.html";
+      }
+    </script>
+  </body>
+</html>

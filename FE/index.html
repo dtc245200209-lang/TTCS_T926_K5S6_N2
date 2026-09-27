@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trang Quản Lý</title>
+    <script src="auth.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        margin: 0;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 10px;
+      }
+      #btnLogout {
+        padding: 8px 16px;
+        background-color: #de350b;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      #btnLogout:hover {
+        background-color: #bf2600;
+      }
+
+      .session-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+      .session-modal-content {
+        background: white;
+        padding: 24px;
+        border-radius: 8px;
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      .session-modal-content button {
+        margin-top: 15px;
+        padding: 8px 20px;
+        background-color: #0052cc;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .session-modal-content button:hover {
+        background-color: #0065ff;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h2>Trang Chủ - Hệ Thống Quản Lý</h2>
+      <button id="btnLogout">Đăng xuất</button>
+    </div>
+
+    <p>Bạn đang ở trong phiên làm việc an toàn.</p>
+
+    <div id="sessionModal" class="session-modal">
+      <div class="session-modal-content">
+        <h3>Thông báo phiên đăng nhập</h3>
+        <p id="sessionMessage">
+          Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại!
+        </p>
+        <button onclick="redirectToLogin()">Đăng nhập lại</button>
+      </div>
+    </div>
+  </body>
+</html>
