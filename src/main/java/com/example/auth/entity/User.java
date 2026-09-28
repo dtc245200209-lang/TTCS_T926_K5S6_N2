@@ -54,6 +54,13 @@ public class User implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
+    @Builder.Default
+    @Column(name = "failed_attempts")
+    private int failedAttempts = 0;
+
+    @Column(name = "lock_time")
+    private LocalDateTime lockTime;
+
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
