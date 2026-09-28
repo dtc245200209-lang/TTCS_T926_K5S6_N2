@@ -18,12 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const K_FAIL      = 'hr_fails';
     const K_LOCK      = 'hr_lock_at';
 
-    // ── Demo users ──────────────────────────────────────
-    const USERS = [
-        { email: 'admin@congty.com',   password: 'password123', role: 'Quản trị viên' },
-        { email: 'hr@congty.com',      password: 'password123', role: 'Nhân sự (HR)' },
-        { email: 'manager@congty.com', password: 'password123', role: 'Quản lý' },
-    ];
+    // (Removed dummy USERS list as we use real API now)
 
     // ── Toggle password visibility ──────────────────────
     const EYE_OPEN = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
@@ -75,7 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function shake() {
-        const box = document.querySelector('.form-box');
+        const box = document.querySelector('.login-form');
+        if (!box) return;
         box.classList.remove('shake');
         void box.offsetWidth;
         box.classList.add('shake');
@@ -106,25 +102,36 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!email || !pwd) return;
 
         setLoading(true);
-        await new Promise(r => setTimeout(r, 950)); // simulate API
 
-        const user = USERS.find(u => u.email === email && u.password === pwd);
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: email, password: pwd })
+            });
 
-        if (user) {
-            clearFails();
-            renderSuccess(user);
-        } else {
-            setLoading(false);
-            pwdEl.value = '';
-            const fails = addFail();
-            const left  = MAX_FAIL - fails;
+            const result = await response.json();
 
-            if (fails >= MAX_FAIL) {
-                localStorage.setItem(K_LOCK, Date.now().toString());
-                isLocked();
+            if (response.ok && result.success) {
+                clearFails();
+                // We use result.data to render success UI
+                renderSuccess({ email: email, role: 'Đã xác thực', token: result.data.accessToken });
             } else {
-                showErr(`Thông tin không chính xác. Còn ${left} lần thử trước khi tài khoản bị khóa.`);
+                setLoading(false);
+                pwdEl.value = '';
+                const fails = addFail();
+                const left  = MAX_FAIL - fails;
+
+                if (fails >= MAX_FAIL) {
+                    localStorage.setItem(K_LOCK, Date.now().toString());
+                    isLocked();
+                } else {
+                    showErr(result.message || `Thông tin không chính xác. Còn ${left} lần thử trước khi tài khoản bị khóa.`);
+                }
             }
+        } catch (error) {
+            setLoading(false);
+            showErr('Không thể kết nối đến máy chủ Backend. Vui lòng đảm bảo Backend đang chạy.');
         }
     });
 

@@ -19,6 +19,7 @@ public class AuthApplication {
      * Khởi tạo tài khoản mẫu để kiểm thử tính năng ngay khi khởi chạy
      */
     @Bean
+    @SuppressWarnings("null")
     public CommandLineRunner initDatabase(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
             if (userRepository.findByUsername("testuser").isEmpty()) {
