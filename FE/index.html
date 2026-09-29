@@ -108,8 +108,11 @@
                 </div>
 
                 <!-- Alerts -->
+                <div id="statusBox" class="alert alert-info" style="display: none;">
+                    <span id="statusMsg"></span>
+                </div>
                 <div id="errBox" class="alert alert-error" style="display: none;">
-                    Tài khoản hoặc mật khẩu không chính xác.
+                    <span id="errMsg">Tài khoản hoặc mật khẩu không chính xác.</span>
                 </div>
                 <div id="lockBox" class="alert alert-warning" style="display: none;">
                     <span id="lockMsg">Tài khoản bị tạm khóa 15 phút.</span>
@@ -128,6 +131,7 @@
         </div>
     </div>
 
+    <script src="session.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

@@ -445,6 +445,11 @@ body {
     color: #B45309;
     border: 1px solid #FDE68A;
 }
+.alert-info {
+    background-color: #EFF6FF;
+    color: #1D4ED8;
+    border: 1px solid #BFDBFE;
+}
 
 .shake {
     animation: shake 0.4s ease-in-out;
