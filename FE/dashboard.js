@@ -1,8 +1,11 @@
+/**
+ * FE/dashboard.js - Logic Quản lý trạng thái phiên đăng nhập & Form Đánh giá ứng viên
+ * Ticket KN-16
+ */
 document.addEventListener('DOMContentLoaded', () => {
     
-    // ── 1. Kiểm tra xác thực ban đầu ──────────────────────────────────────
+    // 1. Kiểm tra trạng thái đã đăng nhập chưa
     if (typeof SessionManager === 'undefined' || !SessionManager.isLoggedIn()) {
-        console.warn('Chưa đăng nhập. Chuyển về trang đăng nhập.');
         window.location.href = 'index.html?reason=expired';
         return;
     }
@@ -13,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         usernameDisplay.textContent = `${user.username} (${user.role || 'Recruiter'})`;
     }
 
-    // ── 2. Đăng ký giám sát phiên & gia hạn tự động (Heartbeat & Activity) ──
+    // 2. Khởi chạy Trình Giám sát & Gia hạn Phiên tự động (Heartbeat & Activity)
     const sessionStatusText = document.getElementById('sessionStatusText');
     const sessionPulse      = document.getElementById('sessionPulse');
 
@@ -34,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ── 3. Quản lý Tự động Lưu nháp Phiếu đánh giá (Draft Auto-save) ────────
+    // 3. Quản lý Tự động lưu nháp dữ liệu đang chấm phiếu (Draft Auto-save)
     const DRAFT_KEY = 'candidate_eval_101';
     const commentsEl   = document.getElementById('evalComments');
     const salaryEl     = document.getElementById('salaryOffer');
@@ -48,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
         problem_solving: 0
     };
 
-    // Thiết lập chọn số sao đánh giá
     document.querySelectorAll('.rating-group').forEach(group => {
         const criterion = group.getAttribute('data-criterion');
         group.querySelectorAll('.rating-btn').forEach(btn => {
@@ -79,12 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Lắng nghe thay đổi input để lưu nháp
     if (commentsEl) commentsEl.addEventListener('input', triggerAutoSave);
     if (salaryEl)   salaryEl.addEventListener('input', triggerAutoSave);
     if (decisionEl) decisionEl.addEventListener('change', triggerAutoSave);
 
-    // Khôi phục bản nháp (nếu có)
+    // Khôi phục bản nháp nếu có
     const existingDraft = SessionManager.getDraft(DRAFT_KEY);
     if (existingDraft && existingDraft.data) {
         const d = existingDraft.data;
@@ -113,7 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Xóa bản nháp
     if (btnClearDraft) {
         btnClearDraft.addEventListener('click', () => {
             SessionManager.clearDraft(DRAFT_KEY);
@@ -126,7 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Nút lưu nháp thủ công
     const btnManualSave = document.getElementById('btnManualSave');
     if (btnManualSave) {
         btnManualSave.addEventListener('click', () => {
@@ -135,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Nộp phiếu đánh giá
     const btnSubmitEval = document.getElementById('btnSubmitEval');
     if (btnSubmitEval) {
         btnSubmitEval.addEventListener('click', () => {
@@ -150,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ── 4. Xử lý các Nút Đăng xuất & Giả lập Hết hạn phiên ─────────────────
+    // 4. Các nút Đăng xuất & Giả lập hết hạn phiên
     const btnLogout = document.getElementById('btnLogout');
     if (btnLogout) {
         btnLogout.addEventListener('click', async () => {
@@ -172,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnTestExpire = document.getElementById('btnTestExpire');
     if (btnTestExpire) {
         btnTestExpire.addEventListener('click', () => {
-            alert('🧪 Mô phỏng tình huống: Server trả về 401 Unauthorized (Phiên bị thu hồi hoặc token hết hạn).');
+            alert('🧪 Mô phỏng tình huống: Server trả về 401 Unauthorized (Token bị thu hồi hoặc hết hạn).');
             SessionManager.handleUnauthorized('revoked');
         });
     }

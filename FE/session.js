@@ -1,6 +1,6 @@
 /**
- * SessionManager - Quản lý trạng thái phiên đăng nhập, tự động gia hạn & xử lý hết hạn
- * Ticket: [FE] Quản lý trạng thái phiên đăng nhập (KN-16 / KN-2)
+ * FE/session.js - Quản lý trạng thái phiên đăng nhập & Tự động gia hạn / Tự động lưu nháp
+ * Ticket KN-16: [FE] Quản lý trạng thái phiên đăng nhập
  */
 const SessionManager = (function () {
     const API_BASE = 'http://localhost:8080/api/auth';
@@ -8,17 +8,16 @@ const SessionManager = (function () {
     const KEY_USER = 'ats_user_info';
     const KEY_LAST_ACTIVE = 'ats_last_active';
     
-    // Cấu hình thời gian (ms)
-    const HEARTBEAT_INTERVAL = 30 * 1000; // Kiểm tra/gia hạn phiên mỗi 30 giây khi có hoạt động
-    const IDLE_TIMEOUT = 15 * 60 * 1000;   // Hết hạn phiên nếu không thao tác trong 15 phút
+    // Đơn vị thời gian (ms)
+    const HEARTBEAT_INTERVAL = 30 * 1000; // Tự động gia hạn phiên mỗi 30s khi có hoạt động
+    const IDLE_TIMEOUT = 15 * 60 * 1000;   // Hết hạn phiên nếu không có thao tác trong 15 phút
     
     let heartbeatTimer = null;
-    let idleCheckTimer = null;
-    let isUserActiveSinceLastHeartbeat = false;
+    let isUserActive = false;
     let onStatusCallback = null;
 
     /**
-     * Lưu thông tin phiên đăng nhập vào Storage
+     * Lưu thông tin phiên đăng nhập
      */
     function saveSession(token, user) {
         localStorage.setItem(KEY_TOKEN, token);
@@ -26,16 +25,10 @@ const SessionManager = (function () {
         localStorage.setItem(KEY_LAST_ACTIVE, Date.now().toString());
     }
 
-    /**
-     * Lấy JWT token hiện tại
-     */
     function getToken() {
         return localStorage.getItem(KEY_TOKEN);
     }
 
-    /**
-     * Lấy thông tin người dùng đang đăng nhập
-     */
     function getUser() {
         const raw = localStorage.getItem(KEY_USER);
         try {
@@ -45,9 +38,6 @@ const SessionManager = (function () {
         }
     }
 
-    /**
-     * Xóa sạch thông tin phiên ở client
-     */
     function clearSession() {
         localStorage.removeItem(KEY_TOKEN);
         localStorage.removeItem(KEY_USER);
@@ -55,28 +45,20 @@ const SessionManager = (function () {
         stopSessionMonitoring();
     }
 
-    /**
-     * Kiểm tra trạng thái đã đăng nhập chưa
-     */
     function isLoggedIn() {
         return !!getToken();
     }
 
     /**
-     * Xử lý khi phiên hết hạn hoặc bị thu hồi -> Chuyển về trang đăng nhập kèm thông báo
+     * Chuyển hướng về trang đăng nhập kèm thông báo rõ ràng
      */
     function handleUnauthorized(reason = 'expired') {
         clearSession();
-        let redirectReason = 'expired';
-        if (reason === 'revoked') redirectReason = 'revoked';
-        if (reason === 'logout') redirectReason = 'logout';
-        if (reason === 'revoked_all') redirectReason = 'revoked_all';
-
-        window.location.href = `index.html?reason=${redirectReason}`;
+        window.location.href = `index.html?reason=${reason}`;
     }
 
     /**
-     * Wrapper Fetch đính kèm Bearer token và bắt lỗi 401 Unauthorized (Phiên bị hủy phía server)
+     * Interceptor Fetch đính kèm Token và xử lý 401 Unauthorized từ Server
      */
     async function fetchWithAuth(url, options = {}) {
         const token = getToken();
@@ -94,22 +76,21 @@ const SessionManager = (function () {
         try {
             const response = await fetch(url, { ...options, headers });
             
-            // Nếu server trả về 401 Unauthorized -> Token hết hạn hoặc tokenVersion không khớp (đã bị thu hồi)
             if (response.status === 401) {
-                console.warn('[SessionManager] Server trả về 401. Phiên đã hết hạn hoặc bị thu hồi phía server.');
+                console.warn('[SessionManager] Server trả về 401. Phiên đã bị thu hồi hoặc hết hạn.');
                 handleUnauthorized('revoked');
-                throw new Error('Phiên làm việc hết hạn hoặc bị thu hồi.');
+                throw new Error('Phiên đã hết hạn hoặc bị thu hồi');
             }
 
             return response;
         } catch (error) {
-            if (error.message.includes('Phiên làm việc')) throw error;
+            if (error.message.includes('Phiên đã hết hạn')) throw error;
             throw error;
         }
     }
 
     /**
-     * Chủ động gọi API kiểm tra / gia hạn phiên với Backend
+     * Gọi API gia hạn & xác thực phiên với Server
      */
     async function verifyAndRenewSession() {
         const token = getToken();
@@ -120,7 +101,6 @@ const SessionManager = (function () {
             if (res.ok) {
                 const data = await res.json();
                 if (data.success && data.data) {
-                    // Cập nhật thông tin user mới nhất
                     const currentUser = getUser() || {};
                     const updatedUser = { ...currentUser, ...data.data };
                     localStorage.setItem(KEY_USER, JSON.stringify(updatedUser));
@@ -129,7 +109,7 @@ const SessionManager = (function () {
                     if (onStatusCallback) {
                         onStatusCallback({
                             status: 'active',
-                            message: 'Phiên hoạt động - Đã gia hạn tự động',
+                            message: 'Phiên đang hoạt động – Tự động gia hạn',
                             lastRenewed: new Date().toLocaleTimeString('vi-VN')
                         });
                     }
@@ -138,28 +118,27 @@ const SessionManager = (function () {
             }
             return false;
         } catch (err) {
-            console.error('[SessionManager] Lỗi kiểm tra/gia hạn phiên:', err);
             return false;
         }
     }
 
     /**
-     * Bắt sự kiện tương tác người dùng (mouse, key, scroll) để đánh dấu active
+     * Đăng ký lắng nghe các sự kiện thao tác của người dùng (chuột, bàn phím, cuộn trang)
      */
     function registerActivityListeners() {
         const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
-        const onUserActivity = () => {
-            isUserActiveSinceLastHeartbeat = true;
+        const onActivity = () => {
+            isUserActive = true;
             localStorage.setItem(KEY_LAST_ACTIVE, Date.now().toString());
         };
 
         events.forEach(evt => {
-            window.addEventListener(evt, onUserActivity, { passive: true });
+            window.addEventListener(evt, onActivity, { passive: true });
         });
     }
 
     /**
-     * Khởi chạy trình giám sát phiên và gia hạn tự động
+     * Bắt đầu trình giám sát & gia hạn tự động khi còn hoạt động
      */
     function startSessionMonitoring(statusCallback) {
         onStatusCallback = statusCallback;
@@ -168,24 +147,23 @@ const SessionManager = (function () {
         // 1. Kiểm tra xác thực ban đầu
         verifyAndRenewSession();
 
-        // 2. Heartbeat định kỳ: Nếu người dùng có hoạt động, tự động gia hạn với backend
+        // 2. Heartbeat định kỳ
         if (heartbeatTimer) clearInterval(heartbeatTimer);
         heartbeatTimer = setInterval(async () => {
-            if (isUserActiveSinceLastHeartbeat) {
-                isUserActiveSinceLastHeartbeat = false;
+            if (isUserActive) {
+                isUserActive = false;
                 await verifyAndRenewSession();
             } else {
-                // Kiểm tra idle timeout
                 const lastActive = parseInt(localStorage.getItem(KEY_LAST_ACTIVE) || '0');
                 const idleTime = Date.now() - lastActive;
                 if (idleTime >= IDLE_TIMEOUT) {
-                    console.warn('[SessionManager] Người dùng không hoạt động trong 15 phút. Hết hạn phiên.');
+                    console.warn('[SessionManager] Quá 15 phút không thao tác. Hết hạn phiên.');
                     handleUnauthorized('expired');
                 } else if (onStatusCallback) {
                     const remainingMins = Math.ceil((IDLE_TIMEOUT - idleTime) / 60000);
                     onStatusCallback({
                         status: 'idle',
-                        message: `Không có thao tác. Phiên sẽ hết hạn sau ${remainingMins} phút nếu không hoạt động.`,
+                        message: `Không có thao tác. Phiên sẽ hết hạn sau ${remainingMins} phút.`,
                         lastRenewed: null
                     });
                 }
@@ -193,24 +171,18 @@ const SessionManager = (function () {
         }, HEARTBEAT_INTERVAL);
     }
 
-    /**
-     * Dừng giám sát phiên
-     */
     function stopSessionMonitoring() {
         if (heartbeatTimer) clearInterval(heartbeatTimer);
-        if (idleCheckTimer) clearInterval(idleCheckTimer);
         heartbeatTimer = null;
-        idleCheckTimer = null;
     }
 
     /**
-     * Thực hiện Đăng xuất (Thu hồi phiên ngay phía server + xóa local state)
+     * Đăng xuất & làm mất hiệu lực phiên ngay lập tức phía server
      */
-    async function logout(revokeAllDevices = false) {
+    async function logout(revokeAll = false) {
         try {
             const token = getToken();
             if (token) {
-                // Gọi API backend thu hồi phiên
                 await fetch(`${API_BASE}/revoke-sessions`, {
                     method: 'POST',
                     headers: {
@@ -220,33 +192,29 @@ const SessionManager = (function () {
                 });
             }
         } catch (e) {
-            console.warn('[SessionManager] Không thể gọi API revoke-sessions, vẫn tiến hành xóa phiên local:', e);
+            console.warn('Lỗi gọi API revoke-sessions:', e);
         } finally {
             clearSession();
-            handleUnauthorized(revokeAllDevices ? 'revoked_all' : 'logout');
+            handleUnauthorized(revokeAll ? 'revoked_all' : 'logout');
         }
     }
 
     /**
-     * Quản lý tự động lưu nháp dữ liệu đang nhập (Draft Auto-save)
+     * Tự động lưu nháp dữ liệu đang nhập dở (Draft Auto-save)
      */
     function saveDraft(key, data) {
         try {
-            const payload = {
+            localStorage.setItem(`draft_${key}`, JSON.stringify({
                 timestamp: Date.now(),
                 data: data
-            };
-            localStorage.setItem(`draft_${key}`, JSON.stringify(payload));
-        } catch (e) {
-            console.error('Lỗi khi lưu bản nháp:', e);
-        }
+            }));
+        } catch (e) {}
     }
 
     function getDraft(key) {
         try {
             const raw = localStorage.getItem(`draft_${key}`);
-            if (!raw) return null;
-            return JSON.parse(raw);
+            return raw ? JSON.parse(raw) : null;
         } catch (e) {
             return null;
         }
