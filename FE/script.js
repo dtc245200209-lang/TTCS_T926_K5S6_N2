@@ -126,7 +126,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const email = emailEl.value.trim();
             const pwd   = pwdEl.value;
-            if (!email || !pwd) return;
+            if (!email || !pwd) {
+                showErr('Vui lòng nhập đầy đủ tài khoản và mật khẩu.');
+                return;
+            }
 
             setLoading(true);
 
