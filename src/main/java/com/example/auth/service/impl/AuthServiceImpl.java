@@ -97,4 +97,18 @@ public class AuthServiceImpl implements AuthService {
         log.info("Đã thu hồi tất cả phiên đăng nhập của user [{}]. token_version mới: {}",
                 username, user.getTokenVersion());
     }
+
+    @Override
+    public com.example.auth.dto.UserResponse getCurrentUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException("Người dùng không tồn tại"));
+
+        return com.example.auth.dto.UserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .tokenVersion(user.getTokenVersion())
+                .build();
+    }
 }

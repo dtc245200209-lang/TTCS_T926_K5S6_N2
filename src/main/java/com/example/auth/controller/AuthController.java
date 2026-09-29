@@ -60,4 +60,17 @@ public class AuthController {
 
         return ResponseEntity.ok(ApiResponse.success("Đã thu hồi tất cả các phiên đăng nhập thành công"));
     }
+
+    /**
+     * Endpoint kiểm tra và xác thực phiên đăng nhập hiện tại.
+     *
+     * @param authentication Thông tin người dùng hiện tại từ Security Context
+     * @return ApiResponse chứa UserResponse
+     */
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<com.example.auth.dto.UserResponse>> getCurrentUser(Authentication authentication) {
+        String currentUsername = authentication.getName();
+        com.example.auth.dto.UserResponse response = authService.getCurrentUser(currentUsername);
+        return ResponseEntity.ok(ApiResponse.success("Phiên đăng nhập hợp lệ", response));
+    }
 }

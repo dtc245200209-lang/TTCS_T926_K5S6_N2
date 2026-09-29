@@ -25,4 +25,9 @@ public interface AuthService {
      * @param username Tên đăng nhập của người dùng
      */
     void revokeAllSessions(String username);
+
+    /**
+     * Lấy thông tin người dùng hiện tại để kiểm tra/gia hạn phiên
+     */
+    com.example.auth.dto.UserResponse getCurrentUser(String username);
 }
