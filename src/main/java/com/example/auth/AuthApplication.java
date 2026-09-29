@@ -21,16 +21,27 @@ public class AuthApplication {
     @Bean
     public CommandLineRunner initDatabase(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            if (userRepository.findByUsername("testuser").isEmpty()) {
-                User user = User.builder()
-                        .username("testuser")
-                        .email("testuser@example.com")
-                        .password(passwordEncoder.encode("OldPassword123"))
-                        .tokenVersion(1L)
-                        .role("ROLE_USER")
-                        .build();
-                userRepository.save(user);
-                System.out.println(">>> Đã khởi tạo người dùng mẫu: testuser / OldPassword123 (tokenVersion: 1)");
+            String encodedPassword = passwordEncoder.encode("123456@");
+            
+            String[] emails = {
+                "dtc245200623@ictu.edu.vn",
+                "dtc245200209@ictu.edu.vn",
+                "dtc245200288@ictu.edu.vn"
+            };
+
+            for (String email : emails) {
+                if (userRepository.findByEmail(email).isEmpty()) {
+                    String username = email.substring(0, email.indexOf("@"));
+                    User user = User.builder()
+                            .username(username)
+                            .email(email)
+                            .password(encodedPassword)
+                            .tokenVersion(1L)
+                            .role("ROLE_USER")
+                            .build();
+                    userRepository.save(user);
+                    System.out.println(">>> Đã khởi tạo người dùng: " + email);
+                }
             }
         };
     }

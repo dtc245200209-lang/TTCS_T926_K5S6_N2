@@ -47,6 +47,13 @@ public class User implements UserDetails {
     private String role = "ROLE_USER";
 
     @Builder.Default
+    @Column(name = "failed_attempts")
+    private Integer failedAttempts = 0;
+
+    @Column(name = "lock_time")
+    private LocalDateTime lockTime;
+
+    @Builder.Default
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 

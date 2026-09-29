@@ -24,11 +24,37 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public com.example.auth.dto.LoginResponse login(com.example.auth.dto.LoginRequest request) {
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new AppException("Tên đăng nhập hoặc mật khẩu không chính xác"));
+        String loginId = request.getUsername();
+        User user = userRepository.findByUsername(loginId)
+                .orElseGet(() -> userRepository.findByEmail(loginId)
+                        .orElseThrow(() -> new AppException("Tên đăng nhập hoặc mật khẩu không chính xác")));
+
+        // Check lock status
+        if (user.getLockTime() != null) {
+            if (user.getLockTime().plusMinutes(15).isAfter(java.time.LocalDateTime.now())) {
+                throw new AppException("Tài khoản đã bị khóa tạm thời. Vui lòng thử lại sau 15 phút.");
+            } else {
+                user.setFailedAttempts(0);
+                user.setLockTime(null);
+                userRepository.save(user);
+            }
+        }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            user.setFailedAttempts(user.getFailedAttempts() + 1);
+            if (user.getFailedAttempts() >= 5) {
+                user.setLockTime(java.time.LocalDateTime.now());
+                userRepository.save(user);
+                throw new AppException("Tài khoản đã bị khóa tạm thời. Vui lòng thử lại sau 15 phút.");
+            }
+            userRepository.save(user);
             throw new AppException("Tên đăng nhập hoặc mật khẩu không chính xác");
+        }
+
+        if (user.getFailedAttempts() > 0 || user.getLockTime() != null) {
+            user.setFailedAttempts(0);
+            user.setLockTime(null);
+            userRepository.save(user);
         }
 
         String token = jwtTokenProvider.generateToken(user);

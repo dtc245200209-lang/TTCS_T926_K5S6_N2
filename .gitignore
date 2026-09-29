@@ -141,3 +141,13 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Java and Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+.idea/
+.vscode/
+apache-maven-*/

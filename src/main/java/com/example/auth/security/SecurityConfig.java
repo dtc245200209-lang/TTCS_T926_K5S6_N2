@@ -41,13 +41,14 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/login", "/api/auth/register", "/h2-console/**").permitAll()
+                .requestMatchers("/", "/login.html", "/dashboard.html", "/forgot-password.html", "/*.css", "/*.js", "/images/**", "/*.png", "/*.jpg").permitAll()
                 .requestMatchers("/api/auth/change-password", "/api/auth/revoke-sessions").authenticated()
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) // Dành cho H2 console
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint((request, response, authException) -> {
-                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    response.setContentType("application/json;charset=UTF-8");
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.getWriter().write("""
                         {
