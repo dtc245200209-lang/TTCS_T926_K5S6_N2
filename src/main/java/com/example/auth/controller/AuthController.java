@@ -4,6 +4,8 @@ import com.example.auth.dto.ApiResponse;
 import com.example.auth.dto.ChangePasswordRequest;
 import com.example.auth.dto.ChangePasswordResponse;
 import com.example.auth.service.AuthService;
+import com.example.auth.service.PasswordResetService;
+import com.example.auth.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,35 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final PasswordResetService passwordResetService;
+    private final UserRepository userRepository;
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Object>>> currentUser(Authentication authentication) {
+        var user = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new com.example.auth.exception.AppException("Người dùng không tồn tại"));
+        var profile = new java.util.LinkedHashMap<String, Object>();
+        profile.put("username", user.getUsername());
+        profile.put("email", user.getEmail());
+        profile.put("role", user.getRole());
+        profile.put("createdAt", user.getCreatedAt());
+        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin tài khoản thành công", profile));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<java.util.Map<String, String>>> requestPasswordReset(
+            @Valid @RequestBody com.example.auth.dto.ForgotPasswordRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(
+                "Nếu email đã đăng ký, hướng dẫn đặt lại mật khẩu sẽ được gửi.",
+                passwordResetService.requestReset(request.email())));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(
+            @Valid @RequestBody com.example.auth.dto.ResetPasswordRequest request) {
+        passwordResetService.confirmReset(request);
+        return ResponseEntity.ok(ApiResponse.success("Đặt lại mật khẩu thành công. Bạn có thể đăng nhập bằng mật khẩu mới."));
+    }
 
     /**
      * Endpoint đăng nhập để lấy JWT token thử nghiệm
