@@ -25,6 +25,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public com.example.auth.dto.LoginResponse login(com.example.auth.dto.LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
+                .or(() -> userRepository.findByEmailIgnoreCase(request.getUsername()))
                 .orElseThrow(() -> new AppException("Tên đăng nhập hoặc mật khẩu không chính xác"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
