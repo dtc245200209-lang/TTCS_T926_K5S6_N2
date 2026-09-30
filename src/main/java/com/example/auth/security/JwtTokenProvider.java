@@ -36,7 +36,7 @@ public class JwtTokenProvider {
                 .subject(user.getUsername())
                 .claim("userId", user.getId())
                 .claim("token_version", user.getTokenVersion()) // Đính kèm token_version vào payload
-                .claim("role", user.getRole())
+                .claim("roles", user.getRoles())
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey())

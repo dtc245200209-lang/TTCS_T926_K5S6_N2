@@ -59,4 +59,36 @@ public class AuthController {
 
         return ResponseEntity.ok(ApiResponse.success("Đã thu hồi tất cả các phiên đăng nhập thành công"));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(
+            @RequestHeader(value = "Authorization", required = false) String bearerToken,
+            Authentication authentication) {
+        
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            String token = bearerToken.substring(7);
+            String username = authentication != null ? authentication.getName() : null;
+            authService.logout(token, username);
+        }
+        return ResponseEntity.ok(ApiResponse.success("Đăng xuất thành công"));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<ApiResponse<com.example.auth.dto.LoginResponse>> refreshToken(
+            @RequestParam("refreshToken") String refreshToken) {
+        com.example.auth.dto.LoginResponse response = authService.refreshToken(refreshToken);
+        return ResponseEntity.ok(ApiResponse.success("Gia hạn phiên thành công", response));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<com.example.auth.dto.UserResponse>> getCurrentUser(Authentication authentication) {
+        com.example.auth.entity.User user = (com.example.auth.entity.User) authentication.getPrincipal();
+        com.example.auth.dto.UserResponse response = com.example.auth.dto.UserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .roles(user.getRoles())
+                .build();
+        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin người dùng thành công", response));
+    }
 }

@@ -5,6 +5,10 @@ import com.example.auth.dto.ChangePasswordResponse;
 import com.example.auth.entity.User;
 import com.example.auth.exception.AppException;
 import com.example.auth.repository.UserRepository;
+import com.example.auth.repository.TokenBlacklistRepository;
+import com.example.auth.repository.RefreshTokenRepository;
+import com.example.auth.entity.TokenBlacklist;
+import com.example.auth.entity.RefreshToken;
 import com.example.auth.security.JwtTokenProvider;
 import com.example.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -21,6 +29,8 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final TokenBlacklistRepository tokenBlacklistRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
     public com.example.auth.dto.LoginResponse login(com.example.auth.dto.LoginRequest request) {
@@ -58,10 +68,24 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String token = jwtTokenProvider.generateToken(user);
+        
+        // Sinh refresh token
+        RefreshToken refreshToken = RefreshToken.builder()
+                .user(user)
+                .token(UUID.randomUUID().toString())
+                .expiryDate(LocalDateTime.now().plusDays(7)) // 7 ngày
+                .build();
+        
+        // Xoá refresh token cũ (nếu có) để chỉ duy trì 1 phiên hoặc cho phép nhiều phiên (ở đây xoá đi cho đơn giản 1 thiết bị, hoặc tuỳ nghiệp vụ. Ở đây cho phép nhiều phiên thì không xoá, nhưng trong bài này tạm thời lưu)
+        // refreshTokenRepository.deleteByUser(user); // Nếu muốn 1 phiên duy nhất
+        refreshTokenRepository.save(refreshToken);
+
         return com.example.auth.dto.LoginResponse.builder()
                 .token(token)
                 .username(user.getUsername())
+                .roles(user.getRoles())
                 .tokenVersion(user.getTokenVersion())
+                .refreshToken(refreshToken.getToken())
                 .build();
     }
 
@@ -122,5 +146,56 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("Đã thu hồi tất cả phiên đăng nhập của user [{}]. token_version mới: {}",
                 username, user.getTokenVersion());
+    }
+
+    @Override
+    @Transactional
+    public void logout(String token, String username) {
+        if (token != null) {
+            // Lấy thời gian hết hạn của token
+            java.util.Date expirationDate = jwtTokenProvider.extractClaims(token).getExpiration();
+            LocalDateTime expiry = LocalDateTime.ofInstant(expirationDate.toInstant(), ZoneId.systemDefault());
+            
+            // Đưa token vào blacklist
+            TokenBlacklist blacklist = TokenBlacklist.builder()
+                    .token(token)
+                    .expiryDate(expiry)
+                    .build();
+            tokenBlacklistRepository.save(blacklist);
+            
+            // Xóa refresh token của user
+            User user = userRepository.findByUsername(username).orElse(null);
+            if (user != null) {
+                refreshTokenRepository.deleteByUser(user);
+            }
+            log.info("Đăng xuất thành công, token đưa vào blacklist cho user [{}]", username);
+        }
+    }
+
+    @Override
+    @Transactional
+    public com.example.auth.dto.LoginResponse refreshToken(String refreshTokenStr) {
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenStr)
+                .orElseThrow(() -> new AppException("Refresh token không hợp lệ hoặc đã hết hạn"));
+
+        if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            refreshTokenRepository.delete(refreshToken);
+            throw new AppException("Refresh token đã hết hạn. Vui lòng đăng nhập lại.");
+        }
+
+        User user = refreshToken.getUser();
+        String newToken = jwtTokenProvider.generateToken(user);
+
+        // Gia hạn refresh token
+        refreshToken.setExpiryDate(LocalDateTime.now().plusDays(7));
+        refreshTokenRepository.save(refreshToken);
+
+        return com.example.auth.dto.LoginResponse.builder()
+                .token(newToken)
+                .username(user.getUsername())
+                .roles(user.getRoles())
+                .tokenVersion(user.getTokenVersion())
+                .refreshToken(refreshToken.getToken())
+                .build();
     }
 }

@@ -25,4 +25,14 @@ public interface AuthService {
      * @param username Tên đăng nhập của người dùng
      */
     void revokeAllSessions(String username);
+
+    /**
+     * Đăng xuất: Đưa token hiện tại vào blacklist và xóa refresh token
+     */
+    void logout(String token, String username);
+
+    /**
+     * Gia hạn phiên bằng refresh token
+     */
+    com.example.auth.dto.LoginResponse refreshToken(String refreshToken);
 }

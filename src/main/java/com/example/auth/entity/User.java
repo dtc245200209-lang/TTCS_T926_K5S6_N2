@@ -42,9 +42,11 @@ public class User implements UserDetails {
     @Column(name = "token_version", nullable = false)
     private Long tokenVersion = 1L;
 
-    @Builder.Default
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
-    private String role = "ROLE_USER";
+    @Builder.Default
+    private java.util.Set<String> roles = new java.util.HashSet<>(java.util.List.of("ROLE_USER"));
 
     @Builder.Default
     @Column(name = "failed_attempts")
@@ -52,6 +54,13 @@ public class User implements UserDetails {
 
     @Column(name = "lock_time")
     private LocalDateTime lockTime;
+    
+    @Column(name = "lock_reason", length = 500)
+    private String lockReason;
+
+    @Builder.Default
+    @Column(name = "is_locked")
+    private Boolean isLocked = false;
 
     @Builder.Default
     @Column(name = "created_at")
@@ -68,7 +77,9 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role));
+        return roles.stream()
+                .map(SimpleGrantedAuthority::new)
+                .toList();
     }
 
     @Override
@@ -88,7 +99,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !Boolean.TRUE.equals(isLocked);
     }
 
     @Override

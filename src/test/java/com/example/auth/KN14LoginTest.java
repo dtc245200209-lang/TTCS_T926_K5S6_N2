@@ -54,7 +54,7 @@ public class KN14LoginTest {
                     .password(passwordEncoder.encode("Password123"))
                     .tokenVersion(1L)
                     .failedAttempts(0)
-                    .role("ROLE_USER")
+                    .roles(new java.util.HashSet<>(java.util.List.of("ROLE_USER")))
                     .build();
             testUser = userRepository.save(testUser);
         } else {

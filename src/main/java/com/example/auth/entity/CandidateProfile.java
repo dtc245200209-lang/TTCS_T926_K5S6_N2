@@ -1,0 +1,25 @@
+package com.example.auth.entity;
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "candidate_profiles")
+@Data @NoArgsConstructor @AllArgsConstructor @Builder
+public class CandidateProfile {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @OneToOne @JoinColumn(name = "user_id")
+    private User user;
+    
+    private String fullName;
+    private String phone;
+    private String address;
+    private String currentTitle;
+    private String cvUrl;
+    
+    @Column(name = "created_at")
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
+}
