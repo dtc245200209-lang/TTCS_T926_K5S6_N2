@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Tạo tài khoản nội bộ</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .form-container { max-width: 400px; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        #message { margin-top: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Tạo tài khoản nội bộ</h2>
+    <form id="createAccountForm">
+        <div class="form-group">
+            <label>Tên đăng nhập (Username):</label>
+            <input type="text" id="username" required>
+        </div>
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" id="email" required>
+        </div>
+        <div class="form-group">
+            <label>Mật khẩu:</label>
+            <input type="password" id="password" required>
+        </div>
+        <div class="form-group">
+            <label>Vai trò (Role):</label>
+            <select id="role">
+                <option value="ADMIN">ADMIN</option>
+                <option value="STAFF">STAFF</option>
+                <option value="MANAGER">MANAGER</option>
+            </select>
+        </div>
+        <button type="submit">Tạo tài khoản</button>
+    </form>
+    <div id="message"></div>
+</div>
+
+<script>
+    document.getElementById('createAccountForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const data = {
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+            role: document.getElementById('role').value
+        };
+
+        const messageDiv = document.getElementById('message');
+
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/register-internal', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                messageDiv.style.color = 'green';
+                messageDiv.innerText = 'Tạo tài khoản nội bộ thành công!';
+                document.getElementById('createAccountForm').reset();
+            } else {
+                const errText = await response.text();
+                messageDiv.style.color = 'red';
+                messageDiv.innerText = 'Lỗi: ' + errText;
+            }
+        } catch (error) {
+            messageDiv.style.color = 'red';
+            messageDiv.innerText = 'Không thể kết nối đến máy chủ!';
+        }
+    });
+</script>
+
+</body>
+</html>
