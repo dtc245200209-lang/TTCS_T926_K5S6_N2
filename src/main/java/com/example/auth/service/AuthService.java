@@ -25,4 +25,24 @@ public interface AuthService {
      * @param username Tên đăng nhập của người dùng
      */
     void revokeAllSessions(String username);
+
+    /**
+     * Đăng xuất: Đưa token hiện tại vào blacklist và xóa refresh token
+     */
+    void logout(String token, String username);
+
+    /**
+     * Gia hạn phiên bằng refresh token
+     */
+    com.example.auth.dto.LoginResponse refreshToken(String refreshToken);
+
+    /**
+     * Yêu cầu cấp mã OTP qua email
+     */
+    void forgotPassword(com.example.auth.dto.ForgotPasswordRequest request);
+
+    /**
+     * Đặt lại mật khẩu bằng mã OTP
+     */
+    void resetPasswordWithOtp(com.example.auth.dto.ResetPasswordWithOtpRequest request);
 }

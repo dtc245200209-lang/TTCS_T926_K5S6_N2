@@ -1,15 +1,25 @@
 package com.example.auth.entity;
-
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-@Entity @Table(name = "job_applications", uniqueConstraints = @UniqueConstraint(columnNames = {"candidate_id", "job_id"}))
-@Getter @Setter @NoArgsConstructor
+@Entity
+@Table(name = "applications")
+@Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class Application {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
-    @ManyToOne(optional = false, fetch = FetchType.EAGER) @JoinColumn(name = "candidate_id") private Candidate candidate;
-    @ManyToOne(optional = false, fetch = FetchType.EAGER) @JoinColumn(name = "job_id") private JobOpening job;
-    @Column(nullable = false) private String stage = "NEW";
-    @Column(nullable = false) private LocalDateTime appliedAt = LocalDateTime.now();
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @ManyToOne @JoinColumn(name = "candidate_profile_id")
+    private CandidateProfile candidateProfile;
+    
+    @ManyToOne @JoinColumn(name = "job_request_id")
+    private JobRequest jobRequest;
+    
+    @Column(length = 50)
+    private String status; // APPLIED, SCREENING, INTERVIEWING, OFFERING, HIRED, REJECTED
+    
+    @Column(name = "applied_at")
+    @Builder.Default
+    private LocalDateTime appliedAt = LocalDateTime.now();
 }

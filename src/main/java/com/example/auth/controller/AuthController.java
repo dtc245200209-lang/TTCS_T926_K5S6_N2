@@ -12,6 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.auth.repository.SystemLogRepository;
+import com.example.auth.entity.SystemLog;
+import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -19,43 +24,29 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-    private final PasswordResetService passwordResetService;
-    private final UserRepository userRepository;
-
-    @GetMapping("/me")
-    public ResponseEntity<ApiResponse<java.util.Map<String, Object>>> currentUser(Authentication authentication) {
-        var user = userRepository.findByUsername(authentication.getName())
-                .orElseThrow(() -> new com.example.auth.exception.AppException("Người dùng không tồn tại"));
-        var profile = new java.util.LinkedHashMap<String, Object>();
-        profile.put("username", user.getUsername());
-        profile.put("email", user.getEmail());
-        profile.put("role", user.getRole());
-        profile.put("createdAt", user.getCreatedAt());
-        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin tài khoản thành công", profile));
-    }
-
-    @PostMapping("/forgot-password")
-    public ResponseEntity<ApiResponse<java.util.Map<String, String>>> requestPasswordReset(
-            @Valid @RequestBody com.example.auth.dto.ForgotPasswordRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(
-                "Nếu email đã đăng ký, hướng dẫn đặt lại mật khẩu sẽ được gửi.",
-                passwordResetService.requestReset(request.email())));
-    }
-
-    @PostMapping("/reset-password")
-    public ResponseEntity<ApiResponse<Void>> resetPassword(
-            @Valid @RequestBody com.example.auth.dto.ResetPasswordRequest request) {
-        passwordResetService.confirmReset(request);
-        return ResponseEntity.ok(ApiResponse.success("Đặt lại mật khẩu thành công. Bạn có thể đăng nhập bằng mật khẩu mới."));
-    }
+    private final SystemLogRepository systemLogRepository;
 
     /**
      * Endpoint đăng nhập để lấy JWT token thử nghiệm
      */
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<com.example.auth.dto.LoginResponse>> login(
-            @Valid @RequestBody com.example.auth.dto.LoginRequest request) {
+            @Valid @RequestBody com.example.auth.dto.LoginRequest request,
+            HttpServletRequest httpRequest) {
         com.example.auth.dto.LoginResponse response = authService.login(request);
+        
+        // Ghi log hệ thống
+        String ipAddress = httpRequest.getHeader("X-Forwarded-For");
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = httpRequest.getRemoteAddr();
+        }
+        SystemLog log = SystemLog.builder()
+                .username(request.getUsername())
+                .action("Đăng nhập thành công")
+                .ipAddress(ipAddress)
+                .timestamp(LocalDateTime.now())
+                .build();
+        systemLogRepository.save(log);
         return ResponseEntity.ok(ApiResponse.success("Đăng nhập thành công", response));
     }
 
@@ -90,5 +81,49 @@ public class AuthController {
         authService.revokeAllSessions(currentUsername);
 
         return ResponseEntity.ok(ApiResponse.success("Đã thu hồi tất cả các phiên đăng nhập thành công"));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(
+            @RequestHeader(value = "Authorization", required = false) String bearerToken,
+            Authentication authentication) {
+        
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            String token = bearerToken.substring(7);
+            String username = authentication != null ? authentication.getName() : null;
+            authService.logout(token, username);
+        }
+        return ResponseEntity.ok(ApiResponse.success("Đăng xuất thành công"));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<ApiResponse<com.example.auth.dto.LoginResponse>> refreshToken(
+            @RequestParam("refreshToken") String refreshToken) {
+        com.example.auth.dto.LoginResponse response = authService.refreshToken(refreshToken);
+        return ResponseEntity.ok(ApiResponse.success("Gia hạn phiên thành công", response));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<com.example.auth.dto.UserResponse>> getCurrentUser(Authentication authentication) {
+        com.example.auth.entity.User user = (com.example.auth.entity.User) authentication.getPrincipal();
+        com.example.auth.dto.UserResponse response = com.example.auth.dto.UserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .roles(user.getRoles())
+                .build();
+        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin người dùng thành công", response));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(@Valid @RequestBody com.example.auth.dto.ForgotPasswordRequest request) {
+        authService.forgotPassword(request);
+        return ResponseEntity.ok(ApiResponse.success("Đã gửi mã OTP về email của bạn", null));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody com.example.auth.dto.ResetPasswordWithOtpRequest request) {
+        authService.resetPasswordWithOtp(request);
+        return ResponseEntity.ok(ApiResponse.success("Đổi mật khẩu thành công", null));
     }
 }

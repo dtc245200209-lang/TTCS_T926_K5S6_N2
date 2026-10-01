@@ -1,0 +1,48 @@
+package com.example.auth.controller;
+
+import com.example.auth.dto.ApiResponse;
+import com.example.auth.dto.UserRequest;
+import com.example.auth.dto.UserResponse;
+import com.example.auth.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Set;
+
+@RestController
+@RequestMapping("/api/users")
+@RequiredArgsConstructor
+public class UserController {
+
+    private final UserService userService;
+
+    // Yêu cầu quyền ROLE_ADMIN cho tất cả các API quản lý tài khoản
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
+        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách người dùng thành công", userService.getAllUsers()));
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<UserResponse>> createUser(@RequestBody UserRequest request) {
+        return ResponseEntity.ok(ApiResponse.success("Tạo tài khoản thành công", userService.createUser(request)));
+    }
+
+    @PutMapping("/{id}/roles")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<UserResponse>> updateUserRoles(
+            @PathVariable Long id, 
+            @RequestBody Set<String> roles) {
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật phân quyền thành công", userService.updateUserRoles(id, roles)));
+    }
+
+    @PutMapping("/{id}/lock")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<UserResponse>> toggleLockUser(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success("Thay đổi trạng thái khóa tài khoản thành công", userService.toggleLockUser(id)));
+    }
+}

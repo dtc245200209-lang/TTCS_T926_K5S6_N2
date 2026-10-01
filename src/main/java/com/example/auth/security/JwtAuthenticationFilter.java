@@ -1,6 +1,7 @@
 package com.example.auth.security;
 
 import com.example.auth.entity.User;
+import com.example.auth.repository.TokenBlacklistRepository;
 import com.example.auth.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,6 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider tokenProvider;
     private final UserRepository userRepository;
+    private final TokenBlacklistRepository tokenBlacklistRepository;
 
     @Override
     protected void doFilterInternal(
@@ -36,6 +38,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwt = getJwtFromRequest(request);
 
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+                // Kiểm tra blacklist
+                if (tokenBlacklistRepository.findByToken(jwt).isPresent()) {
+                    log.warn("Token đã bị thu hồi trong blacklist!");
+                    filterChain.doFilter(request, response);
+                    return;
+                }
+
                 String username = tokenProvider.getUsernameFromToken(jwt);
                 Long tokenVersionInJwt = tokenProvider.getTokenVersionFromToken(jwt);
 

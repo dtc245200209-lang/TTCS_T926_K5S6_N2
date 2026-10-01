@@ -17,8 +17,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -42,15 +45,15 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/forgot-password",
-                        "/api/auth/reset-password", "/h2-console/**").permitAll()
-                .requestMatchers("/api/auth/change-password", "/api/auth/revoke-sessions").authenticated()
+                .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh-token", "/api/auth/forgot-password", "/api/auth/reset-password", "/h2-console/**").permitAll()
+                .requestMatchers("/", "/login.html", "/dashboard.html", "/users.html", "/forgot-password.html", "/*.css", "/*.js", "/images/**", "/*.png", "/*.jpg").permitAll()
+                .requestMatchers("/api/auth/change-password", "/api/auth/revoke-sessions", "/api/auth/logout").authenticated()
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) // Dành cho H2 console
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint((request, response, authException) -> {
-                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    response.setContentType("application/json;charset=UTF-8");
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.getWriter().write("""
                         {

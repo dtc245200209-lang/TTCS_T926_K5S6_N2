@@ -5,22 +5,29 @@ spring:
   application:
     name: auth-service
   datasource:
-    url: jdbc:h2:file:./data/atsdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driverClassName: org.h2.Driver
+    url: jdbc:sqlserver://localhost\SQLEXPRESS02;databaseName=TTCS_T926_K5S6_N2;encrypt=true;trustServerCertificate=true
+    driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
     username: sa
-    password:
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    password: 123
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.SQLServerDialect
     hibernate:
       ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: YOUR_EMAIL@gmail.com
+    password: YOUR_APP_PASSWORD
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 jwt:
   # Secret key tối thiểu 256 bits cho HS256
