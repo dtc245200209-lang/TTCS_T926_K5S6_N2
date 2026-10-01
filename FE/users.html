@@ -84,6 +84,7 @@
             <div class="filter-heading">
               <div>
                 <h2>Tìm kiếm và lọc</h2>
+
                 <p>
                   Tìm kiếm theo tên, email, phòng ban hoặc lọc theo vai trò và
                   trạng thái.
@@ -93,7 +94,7 @@
 
             <div class="filter-grid">
               <div class="form-group search-group">
-                <label for="searchInput"> Tìm kiếm </label>
+                <label for="searchInput">Tìm kiếm</label>
 
                 <input
                   id="searchInput"
@@ -104,7 +105,7 @@
               </div>
 
               <div class="form-group">
-                <label for="roleFilter"> Vai trò </label>
+                <label for="roleFilter">Vai trò</label>
 
                 <select id="roleFilter">
                   <option value="">Tất cả vai trò</option>
@@ -116,7 +117,7 @@
               </div>
 
               <div class="form-group">
-                <label for="statusFilter"> Trạng thái </label>
+                <label for="statusFilter">Trạng thái</label>
 
                 <select id="statusFilter">
                   <option value="">Tất cả trạng thái</option>
@@ -164,12 +165,11 @@
                     <th>Phòng ban</th>
                     <th>Vai trò</th>
                     <th>Trạng thái</th>
+                    <th>Thao tác</th>
                   </tr>
                 </thead>
 
-                <tbody id="userTableBody">
-                  <!-- JavaScript render dữ liệu -->
-                </tbody>
+                <tbody id="userTableBody"></tbody>
               </table>
             </div>
 
@@ -179,7 +179,7 @@
 
             <!-- Phân trang -->
             <div class="pagination-wrapper">
-              <span id="paginationInfo"> Trang 1 </span>
+              <span id="paginationInfo">Trang 1</span>
 
               <div
                 class="pagination"
@@ -188,6 +188,91 @@
               ></div>
             </div>
           </section>
+
+          <!-- Modal quản lý vai trò -->
+          <div class="role-modal" id="roleModal" hidden>
+            <div class="role-modal-overlay" id="roleModalOverlay"></div>
+
+            <section
+              class="role-modal-content"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="roleModalTitle"
+            >
+              <div class="role-modal-header">
+                <div>
+                  <p class="eyebrow">QUẢN TRỊ TÀI KHOẢN</p>
+
+                  <h2 id="roleModalTitle">Quản lý vai trò</h2>
+
+                  <p id="roleModalUser" class="role-modal-user"></p>
+                </div>
+
+                <button
+                  type="button"
+                  class="modal-close-button"
+                  id="closeRoleModal"
+                  aria-label="Đóng"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div class="role-options">
+                <label class="role-option">
+                  <input type="checkbox" value="Admin" />
+
+                  <span>
+                    <strong>Admin</strong>
+                  </span>
+                </label>
+
+                <label class="role-option">
+                  <input type="checkbox" value="HR" />
+
+                  <span>
+                    <strong>HR</strong>
+                  </span>
+                </label>
+
+                <label class="role-option">
+                  <input type="checkbox" value="Manager" />
+
+                  <span>
+                    <strong>Manager</strong>
+                  </span>
+                </label>
+
+                <label class="role-option">
+                  <input type="checkbox" value="Employee" />
+
+                  <span>
+                    <strong>Employee</strong>
+                  </span>
+                </label>
+              </div>
+
+              <p class="role-warning" id="roleWarning" hidden></p>
+
+              <div class="role-modal-actions">
+                <button
+                  type="button"
+                  class="quiet-button"
+                  id="cancelRoleButton"
+                >
+                  Hủy
+                </button>
+
+                <button
+                  type="button"
+                  class="primary-button"
+                  id="saveRoleButton"
+                >
+                  Lưu thay đổi
+                </button>
+              </div>
+            </section>
+          </div>
 
           <footer>
             Hệ thống Tuyển dụng Nội bộ
@@ -198,6 +283,8 @@
       </main>
     </div>
 
+    <!-- Session phải được load trước users.js -->
+    <script src="session.js"></script>
     <script src="users.js"></script>
   </body>
 </html>
