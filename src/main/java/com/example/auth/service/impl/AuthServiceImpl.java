@@ -11,6 +11,7 @@ import com.example.auth.entity.TokenBlacklist;
 import com.example.auth.entity.RefreshToken;
 import com.example.auth.security.JwtTokenProvider;
 import com.example.auth.service.AuthService;
+import com.example.auth.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +32,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenBlacklistRepository tokenBlacklistRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final EmailService emailService;
 
     @Override
     public com.example.auth.dto.LoginResponse login(com.example.auth.dto.LoginRequest request) {
@@ -197,5 +199,45 @@ public class AuthServiceImpl implements AuthService {
                 .tokenVersion(user.getTokenVersion())
                 .refreshToken(refreshToken.getToken())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void forgotPassword(com.example.auth.dto.ForgotPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AppException("Không tìm thấy tài khoản với email này"));
+
+        // Generate 6-digit OTP
+        String otp = String.format("%06d", new java.util.Random().nextInt(999999));
+        user.setResetOtp(otp);
+        user.setResetOtpExpiry(LocalDateTime.now().plusMinutes(5));
+        userRepository.save(user);
+
+        // Send Email
+        emailService.sendOtpEmail(user.getEmail(), otp);
+    }
+
+    @Override
+    @Transactional
+    public void resetPasswordWithOtp(com.example.auth.dto.ResetPasswordWithOtpRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AppException("Không tìm thấy tài khoản với email này"));
+
+        if (user.getResetOtp() == null || !user.getResetOtp().equals(request.getOtp())) {
+            throw new AppException("Mã OTP không hợp lệ");
+        }
+
+        if (user.getResetOtpExpiry() == null || user.getResetOtpExpiry().isBefore(LocalDateTime.now())) {
+            throw new AppException("Mã OTP đã hết hạn");
+        }
+
+        // Change password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setResetOtp(null);
+        user.setResetOtpExpiry(null);
+        
+        // Revoke sessions
+        user.setTokenVersion(user.getTokenVersion() + 1);
+        userRepository.save(user);
     }
 }

@@ -70,6 +70,12 @@ public class User implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
+    @Column(name = "reset_otp")
+    private String resetOtp;
+
+    @Column(name = "reset_otp_expiry")
+    private LocalDateTime resetOtpExpiry;
+
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();

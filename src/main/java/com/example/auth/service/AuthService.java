@@ -35,4 +35,14 @@ public interface AuthService {
      * Gia hạn phiên bằng refresh token
      */
     com.example.auth.dto.LoginResponse refreshToken(String refreshToken);
+
+    /**
+     * Yêu cầu cấp mã OTP qua email
+     */
+    void forgotPassword(com.example.auth.dto.ForgotPasswordRequest request);
+
+    /**
+     * Đặt lại mật khẩu bằng mã OTP
+     */
+    void resetPasswordWithOtp(com.example.auth.dto.ResetPasswordWithOtpRequest request);
 }

@@ -17,10 +17,11 @@ public class Interview {
     private User interviewer;
     
     private LocalDateTime scheduledAt;
+    @Column(columnDefinition = "NVARCHAR(255)")
     private String location;
     private String meetingLink;
     
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "NVARCHAR(MAX)")
     private String feedback;
     
     @Column(length = 50)

@@ -26,11 +26,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final CandidateProfileRepository candidateProfileRepository;
 
     @Override
-    public ApplicationDto applyForJob(Long jobRequestId, String username) {
+    public ApplicationDto applyForJob(Long jobRequestId, String username, String cvUrl) {
         JobRequest job = jobRequestRepository.findById(jobRequestId)
-                .orElseThrow(() -> new RuntimeException("Job not found"));
+                .orElseThrow(() -> new com.example.auth.exception.AppException("Không tìm thấy Vị trí tuyển dụng với ID này"));
         User candidate = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new com.example.auth.exception.AppException("Không tìm thấy thông tin ứng viên"));
         
         CandidateProfile profile = candidateProfileRepository.findByUserId(candidate.getId())
                 .orElseGet(() -> {
@@ -39,6 +39,11 @@ public class ApplicationServiceImpl implements ApplicationService {
                     newProfile.setFullName(candidate.getUsername());
                     return candidateProfileRepository.save(newProfile);
                 });
+        
+        if (cvUrl != null) {
+            profile.setCvUrl(cvUrl);
+            candidateProfileRepository.save(profile);
+        }
 
         Application app = new Application();
         app.setJobRequest(job);
@@ -53,7 +58,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public List<ApplicationDto> getApplicationsByCandidate(String username) {
         User candidate = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new com.example.auth.exception.AppException("Không tìm thấy thông tin ứng viên"));
         return applicationRepository.findAll().stream()
                 .filter(a -> a.getCandidateProfile() != null && a.getCandidateProfile().getUser().getId().equals(candidate.getId()))
                 .map(this::mapToDto)
@@ -78,7 +83,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public ApplicationDto updateStatus(Long id, String status) {
         Application app = applicationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("App not found"));
+                .orElseThrow(() -> new com.example.auth.exception.AppException("Không tìm thấy hồ sơ ứng tuyển"));
         app.setStatus(status);
         Application saved = applicationRepository.save(app);
         return mapToDto(saved);
@@ -94,6 +99,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .status(a.getStatus())
                 .appliedAt(a.getAppliedAt())
                 .interviewScore("85/100") // Mock data cho phỏng vấn
+                .cvUrl(a.getCandidateProfile() != null ? a.getCandidateProfile().getCvUrl() : null)
                 .build();
     }
 }

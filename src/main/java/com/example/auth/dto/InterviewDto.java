@@ -13,4 +13,6 @@ public class InterviewDto {
     private LocalDateTime scheduledAt;
     private String status; // SCHEDULED, COMPLETED, CANCELLED
     private String feedback; // Interviewer feedback
+    private String location;
+    private String meetingLink;
 }

@@ -13,9 +13,12 @@ public class CandidateProfile {
     @OneToOne @JoinColumn(name = "user_id")
     private User user;
     
+    @Column(columnDefinition = "NVARCHAR(255)")
     private String fullName;
     private String phone;
+    @Column(columnDefinition = "NVARCHAR(MAX)")
     private String address;
+    @Column(columnDefinition = "NVARCHAR(255)")
     private String currentTitle;
     private String cvUrl;
     

@@ -16,7 +16,7 @@ public class Offer {
     private Double offeredSalary;
     private LocalDateTime expectedStartDate;
     
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "NVARCHAR(MAX)")
     private String note;
     
     @Column(length = 50)

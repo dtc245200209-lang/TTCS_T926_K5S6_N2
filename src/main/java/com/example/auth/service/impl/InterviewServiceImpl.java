@@ -90,6 +90,8 @@ public class InterviewServiceImpl implements InterviewService {
                 .scheduledAt(i.getScheduledAt())
                 .status(i.getStatus())
                 .feedback(i.getFeedback())
+                .location(i.getLocation())
+                .meetingLink(i.getMeetingLink())
                 .build();
     }
 }

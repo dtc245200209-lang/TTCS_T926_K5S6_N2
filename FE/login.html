@@ -452,7 +452,7 @@
 
             <!-- sessionAlert removed for better UI -->
 
-            <form id="loginForm">
+            <div id="loginForm">
                 <div class="form-group">
                     <div class="input-wrapper">
                         <svg class="input-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -471,7 +471,7 @@
                                 d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
                             </path>
                         </svg>
-                        <input type="password" id="password" class="form-control" placeholder="Mật khẩu" required>
+                        <input type="password" id="password" class="form-control" placeholder="Mật khẩu" required autocomplete="new-password">
                         <svg class="toggle-password" id="togglePassword" fill="none" stroke="currentColor"
                             stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -489,13 +489,13 @@
                     <a href="forgot-password.html" class="forgot-link">Quên mật khẩu?</a>
                 </div>
 
-                <button type="submit" class="btn-submit" id="submitBtn">
+                <button type="button" class="btn-submit" id="submitBtn">
                     Đăng nhập
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                     </svg>
                 </button>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -506,6 +506,8 @@
                 showToast("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại!", "error");
             } else if (urlParams.get("action") === "logout") {
                 showToast("Đăng xuất thành công!", "success");
+            } else if (urlParams.get("session") === "changed") {
+                showToast("Vui lòng đăng nhập lại!", "success", 2000);
             }
         });
 
@@ -522,7 +524,21 @@
             }
         });
 
-        function showToast(message, type = 'error') {
+        passwordInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('submitBtn').click();
+            }
+        });
+        
+        document.getElementById('username').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                passwordInput.focus();
+            }
+        });
+
+        function showToast(message, type = 'error', duration = 3000) {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
@@ -535,10 +551,10 @@
             setTimeout(() => {
                 toast.classList.remove('show');
                 setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            }, duration);
         }
 
-        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+        document.getElementById('submitBtn').addEventListener('click', async function (e) {
             e.preventDefault();
             const username = document.getElementById('username').value.trim();
             const password = passwordInput.value.trim();

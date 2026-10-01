@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 public class JobRequest {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(columnDefinition = "NVARCHAR(255)")
     private String title;
     
     @ManyToOne @JoinColumn(name = "department_id")
@@ -24,10 +25,10 @@ public class JobRequest {
     private Double minSalary;
     private Double maxSalary;
     
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "NVARCHAR(MAX)")
     private String description;
     
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "NVARCHAR(MAX)")
     private String requirements;
     
     @Column(length = 50)

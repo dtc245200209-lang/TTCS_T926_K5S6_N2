@@ -109,10 +109,10 @@ public class JobRequestServiceImpl implements JobRequestService {
     @Override
     public JobRequestDto assignRecruiter(Long id, String recruiterUsername) {
         JobRequest job = jobRequestRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Job Request not found"));
+                .orElseThrow(() -> new com.example.auth.exception.AppException("Không tìm thấy Yêu cầu tuyển dụng này"));
         
         User recruiter = userRepository.findByUsername(recruiterUsername)
-                .orElseThrow(() -> new RuntimeException("Recruiter not found"));
+                .orElseThrow(() -> new com.example.auth.exception.AppException("Không tìm thấy Recruiter này"));
                 
         job.setRecruiter(recruiter);
         job.setStatus("OPEN");

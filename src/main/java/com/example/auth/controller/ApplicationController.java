@@ -18,13 +18,31 @@ import java.util.List;
 public class ApplicationController {
     private final ApplicationService applicationService;
 
-    @PostMapping("/{jobId}/apply")
+    @PostMapping(value = "/{jobId}/apply", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('CANDIDATE') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<ApplicationDto>> apply(
             @PathVariable Long jobId,
+            @RequestParam(value = "file", required = false) org.springframework.web.multipart.MultipartFile file,
             Authentication authentication) {
         String username = authentication.getName();
-        ApplicationDto dto = applicationService.applyForJob(jobId, username);
+        
+        String cvUrl = null;
+        if (file != null && !file.isEmpty()) {
+            try {
+                java.nio.file.Path uploadDir = java.nio.file.Paths.get("FE/uploads");
+                if (!java.nio.file.Files.exists(uploadDir)) {
+                    java.nio.file.Files.createDirectories(uploadDir);
+                }
+                String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+                java.nio.file.Path filePath = uploadDir.resolve(filename);
+                file.transferTo(filePath.toFile());
+                cvUrl = "uploads/" + filename;
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(ApiResponse.error("Lỗi khi tải lên file CV"));
+            }
+        }
+
+        ApplicationDto dto = applicationService.applyForJob(jobId, username, cvUrl);
         return ResponseEntity.ok(ApiResponse.success("Ứng tuyển thành công", dto));
     }
 

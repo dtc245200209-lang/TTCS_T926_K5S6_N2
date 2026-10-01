@@ -13,4 +13,5 @@ public class ApplicationDto {
     private String status;
     private LocalDateTime appliedAt;
     private String interviewScore;
+    private String cvUrl;
 }
