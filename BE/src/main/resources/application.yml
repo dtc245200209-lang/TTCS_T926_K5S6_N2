@@ -1,0 +1,36 @@
+server:
+  port: ${PORT:3000}
+
+spring:
+  application:
+    name: password-reset-api
+
+  profiles:
+    default: dev
+
+  datasource:
+    url: jdbc:sqlserver://(localdb)\\MSSQLLocalDB;databaseName=TTCS;encrypt=true;trustServerCertificate=true;integratedSecurity=true
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
+
+  h2:
+    console:
+      enabled: false
+      path: /h2-console
+
+app:
+  seed:
+    enabled: ${SEED_ENABLED:false}
+    email: ${SEED_EMAIL:testuser@example.com}
+
+  reset:
+    token-ttl-minutes: ${RESET_TOKEN_TTL_MINUTES:30}
+    expose-token: ${EXPOSE_RESET_TOKEN:false}
+    log-token: ${LOG_RESET_TOKEN:false}

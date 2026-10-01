@@ -42,7 +42,8 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/login", "/api/auth/register", "/h2-console/**").permitAll()
+                .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/forgot-password",
+                        "/api/auth/reset-password", "/h2-console/**").permitAll()
                 .requestMatchers("/api/auth/change-password", "/api/auth/revoke-sessions").authenticated()
                 .anyRequest().authenticated()
             )

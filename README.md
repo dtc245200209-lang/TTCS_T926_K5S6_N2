@@ -10,7 +10,9 @@
 ---
 
 ## 1. Tổng quan dự án
-
+ Mật khẩu đăng nhập HT:
+ Email: testuser@example.com
+Mật khẩu: OldPassword123
 Hệ thống tuyển dụng nội bộ (Internal Recruitment Management System – ATS) là ứng dụng quản lý tuyển dụng trên nền tảng web, hỗ trợ doanh nghiệp theo dõi toàn bộ vòng đời tuyển dụng trên một nguồn dữ liệu tập trung, từ khi phát sinh nhu cầu nhân sự đến khi ứng viên nhận việc.
 
 Dự án hướng đến việc thay thế cách quản lý rời rạc bằng Excel, Gmail và Google Drive bằng quy trình có thể theo dõi, kiểm soát và truy xuất lịch sử. Các quyết định quan trọng như phê duyệt nhu cầu tuyển dụng, chuyển giai đoạn ứng viên và chốt đề xuất nhận việc cần có tiêu chí rõ ràng và lưu lại dấu vết xử lý.
@@ -276,12 +278,25 @@ Các giả định nghiệp vụ trong backlog cần được Product Owner xác
 
 ```text
 TTCS_T926_K5S6_N2/
-├── BE/          # Mã nguồn Backend
-├── FE/          # Mã nguồn Frontend
-└── README.md    # Tài liệu giới thiệu dự án
+├── src/         # Backend Spring Boot: xác thực và API tuyển dụng
+├── FE/          # Frontend HTML, CSS, JavaScript
+├── BE/          # Dịch vụ password reset độc lập
+└── data/        # Cơ sở dữ liệu H2 cục bộ (không đưa lên Git)
 ```
 
-Cấu trúc chi tiết bên trong `BE/` và `FE/` sẽ được bổ sung theo công nghệ và quy ước triển khai thực tế của nhóm.
+### Chạy giao diện tuyển dụng tại máy local
+
+Mở hai terminal tại thư mục repository:
+
+```powershell
+# Terminal 1: Backend API tại cổng 8080 (Java 21)
+.\mvnw.cmd spring-boot:run
+
+# Terminal 2: Frontend tại cổng 5500
+py -m http.server 5500 --directory FE --bind 127.0.0.1
+```
+
+Mở `http://localhost:5500`, đăng nhập. Nhà tuyển dụng quản lý vị trí, ứng viên và pipeline trên bảng điều khiển; nhân viên chọn **Cổng nhân viên** để xem cơ hội nội bộ, ứng tuyển bằng tài khoản của mình và theo dõi trạng thái hồ sơ. Dữ liệu được lưu trong `data/atsdb`.
 
 ---
 

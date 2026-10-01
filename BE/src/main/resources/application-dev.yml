@@ -1,0 +1,12 @@
+spring:
+  h2:
+    console:
+      enabled: true
+
+app:
+  seed:
+    enabled: ${SEED_ENABLED:true}
+    password: ${SEED_PASSWORD:ChangeMe123!}
+  reset:
+    expose-token: ${EXPOSE_RESET_TOKEN:true}
+    log-token: ${LOG_RESET_TOKEN:true}

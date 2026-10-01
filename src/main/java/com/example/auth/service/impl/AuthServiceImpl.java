@@ -24,11 +24,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public com.example.auth.dto.LoginResponse login(com.example.auth.dto.LoginRequest request) {
-        User user = userRepository.findByEmail(request.getUsername())
-                .orElseGet(() -> userRepository.findByUsername(request.getUsername()).orElse(null));
 
-        if (user == null) {
-            throw new AppException("Tên đăng nhập hoặc mật khẩu không chính xác");
+        User user = userRepository.findByUsername(request.getUsername())
+                .or(() -> userRepository.findByEmailIgnoreCase(request.getUsername()))
+                .orElseThrow(() -> new AppException("Tên đăng nhập hoặc mật khẩu không chính xác"))
         }
 
         if (user.getLockTime() != null) {
