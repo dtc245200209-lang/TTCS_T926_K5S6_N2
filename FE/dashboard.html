@@ -7,52 +7,84 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: #f3f4f6; display: flex; height: 100vh; overflow: hidden; }
+        body { background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); display: flex; height: 100vh; overflow: hidden; }
         
         /* Sidebar */
-        .sidebar { width: 260px; background: #ffffff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; }
-        .sidebar-header { padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 12px; }
-        .sidebar-header h2 { font-size: 18px; color: #1e3a8a; }
+        .sidebar { width: 260px; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border-right: 1px solid rgba(255,255,255,0.4); display: flex; flex-direction: column; box-shadow: 2px 0 15px rgba(0,0,0,0.03); z-index: 10; }
+        .sidebar-header { padding: 24px; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; gap: 12px; }
+        .sidebar-header h2 { font-size: 18px; color: #1e3a8a; font-weight: 700; letter-spacing: -0.5px; }
         .sidebar-menu { padding: 20px 10px; flex: 1; overflow-y: auto; }
-        .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #475569; text-decoration: none; border-radius: 8px; font-size: 15px; font-weight: 500; margin-bottom: 4px; transition: background 0.2s; cursor: pointer; }
-        .menu-item:hover { background: #f1f5f9; color: #1e293b; }
-        .menu-item.active { background: #eff6ff; color: #2563eb; }
+        .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #475569; text-decoration: none; border-radius: 12px; font-size: 14px; font-weight: 500; margin-bottom: 6px; transition: all 0.3s ease; cursor: pointer; }
+        .menu-item:hover { background: rgba(255, 255, 255, 0.9); color: #2563eb; transform: translateX(4px); box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .menu-item.active { background: #2563eb; color: white; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+        .menu-item.active svg { stroke: white; }
         
         /* Main Content */
-        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .header { background: #ffffff; padding: 16px 30px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: flex-end; align-items: center; }
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .header { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(12px); padding: 16px 30px; border-bottom: 1px solid rgba(255,255,255,0.5); display: flex; justify-content: flex-end; align-items: center; z-index: 5; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
         .user-info { display: flex; align-items: center; gap: 16px; }
         .user-name { font-weight: 600; color: #1e293b; font-size: 14px; text-align: right; }
         .user-role-badge { display: block; font-size: 12px; color: #64748b; font-weight: 400; margin-top: 2px; }
         
-        .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 13px; transition: background 0.2s; }
-        .btn-logout:hover { background: #dc2626; }
+        .btn-logout { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: 500; font-size: 13px; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3); }
+        .btn-logout:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4); }
         
         .content-area { padding: 30px; flex: 1; overflow-y: auto; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .container { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); padding: 32px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.6); }
         
-        h1 { color: #1e3a8a; font-size: 24px; margin-bottom: 20px; }
+        h1 { color: #1e293b; font-size: 26px; margin-bottom: 24px; font-weight: 700; letter-spacing: -0.5px; }
         
-        .tasks-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .task-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; }
-        .task-title { font-weight: 600; color: #1e293b; margin-bottom: 8px; font-size: 16px; }
-        .task-desc { color: #64748b; font-size: 14px; line-height: 1.5; }
+        .tasks-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+        .task-card { background: white; border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 16px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: all 0.3s ease; }
+        .task-card:hover { transform: translateY(-4px); box-shadow: 0 12px 25px rgba(0,0,0,0.05); border-color: #cbd5e1; }
+        .task-title { font-weight: 600; color: #0f172a; margin-bottom: 10px; font-size: 17px; }
+        .task-desc { color: #64748b; font-size: 14px; line-height: 1.6; }
         
         /* SPA UI Components */
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-weight: 500; font-size: 14px; margin-bottom: 8px; color: #475569; }
-        .form-control { width: 100%; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; transition: 0.2s; }
-        .form-control:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-        .btn-primary { background: #2563eb; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
-        .btn-primary:hover { background: #1d4ed8; }
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .data-table th { text-align: left; padding: 16px; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; text-transform: uppercase; }
-        .data-table td { padding: 16px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-        .data-table tr:hover td { background: #f8fafc; }
-        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
-        .status-pending { background: #fef08a; color: #854d0e; }
+        .form-group label { display: block; font-weight: 500; font-size: 14px; margin-bottom: 8px; color: #334155; }
+        .form-control { width: 100%; padding: 14px 18px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 14px; outline: none; transition: all 0.3s ease; background: rgba(255,255,255,0.9); }
+        .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); background: white; }
+        .btn-primary { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; padding: 14px 28px; border-radius: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.25); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35); background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 10px; }
+        .data-table th { text-align: left; padding: 16px; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .data-table td { padding: 16px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #334155; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr { transition: all 0.2s ease; }
+        .data-table tr:hover td { background: rgba(248, 250, 252, 0.8); }
+        .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .status-pending { background: #fef9c3; color: #a16207; }
         .status-active { background: #dcfce7; color: #166534; }
-        .card-view { background: #fff; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .status-locked { background: #fee2e2; color: #b91c1c; }
+        .card-view { background: white; padding: 28px; border-radius: 16px; border: 1px solid rgba(226, 232, 240, 0.8); margin-bottom: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+
+        /* Chatbot UI */
+        .chatbot-fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: linear-gradient(135deg, #6366f1, #4f46e5); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4); cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000; }
+        .chatbot-fab:hover { transform: scale(1.1); box-shadow: 0 12px 30px rgba(79, 70, 229, 0.5); }
+        .chatbot-fab svg { width: 28px; height: 28px; color: white; fill: currentColor; }
+        .chatbot-window { position: fixed; bottom: 100px; right: 30px; width: 350px; height: 500px; background: white; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; z-index: 1000; opacity: 0; pointer-events: none; transform: translateY(20px) scale(0.95); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(0,0,0,0.05); }
+        .chatbot-window.open { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
+        .chatbot-header { background: linear-gradient(135deg, #6366f1, #4f46e5); padding: 20px; color: white; display: flex; align-items: center; justify-content: space-between; }
+        .chatbot-header h3 { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .chatbot-close { background: none; border: none; color: white; cursor: pointer; opacity: 0.8; transition: 0.2s; display: flex; }
+        .chatbot-close:hover { opacity: 1; transform: scale(1.1); }
+        .chatbot-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; background: #f8fafc; }
+        .chat-msg { max-width: 80%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
+        .chat-msg.bot { background: white; color: #1e293b; align-self: flex-start; border-bottom-left-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; }
+        .chat-msg.user { background: #4f46e5; color: white; align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 2px 5px rgba(79, 70, 229, 0.2); }
+        .chatbot-input-area { padding: 16px; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 12px; align-items: center; }
+        .chatbot-input { flex: 1; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 20px; font-size: 14px; outline: none; transition: 0.2s; background: #f8fafc; }
+        .chatbot-input:focus { border-color: #4f46e5; background: white; }
+        .chatbot-send { background: #4f46e5; color: white; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; flex-shrink: 0; }
+        .chatbot-send:hover { background: #4338ca; transform: scale(1.05); }
+        .chatbot-send svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; fill: none; }
+        
+        .typing-indicator { display: flex; gap: 4px; padding: 12px 16px; background: white; border-radius: 16px; border-bottom-left-radius: 4px; align-self: flex-start; border: 1px solid #e2e8f0; align-items: center; }
+        .typing-dot { width: 6px; height: 6px; background: #94a3b8; border-radius: 50%; animation: typing 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -88,6 +120,32 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Chatbot Widget -->
+    <div class="chatbot-fab" id="chatbotFab" onclick="toggleChatbot()">
+        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"></path></svg>
+    </div>
+    
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chatbot-header">
+            <div>
+                <h3 style="margin-bottom: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> Trợ lý Tuyển dụng</h3>
+                <div style="font-size: 11px; opacity: 0.9;">Hotline hỗ trợ: 000887765414</div>
+            </div>
+            <button class="chatbot-close" onclick="toggleChatbot()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="chatbot-messages" id="chatbotMessages">
+            <div class="chat-msg bot">Xin chào! Tôi là Trợ lý Ảo. Tôi có thể giúp gì cho bạn hôm nay? (Hotline HT: 000887765414)</div>
+        </div>
+        <div class="chatbot-input-area">
+            <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Nhập tin nhắn..." onkeypress="handleChatbotKeyPress(event)">
+            <button class="chatbot-send" onclick="sendChatbotMessage()">
+                <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
+            </button>
         </div>
     </div>
 
@@ -419,9 +477,22 @@
                     setTimeout(loadJobRequestsList, 100);
                     break;
                 case 'Duyệt Offer vượt hạn mức':
-                    html = renderTable('Offer cần phê duyệt đặc biệt', ['Ứng viên', 'Vị trí', 'Mức lương đề xuất', 'Mức trần quy định', 'Thao tác'], [
-                        ['Nguyễn Văn A', 'Tech Lead', '60,000,000đ', '50,000,000đ', '<button class="btn-primary" style="padding: 4px 10px; font-size:12px; background:#10b981;">Phê duyệt</button>']
-                    ]); break;
+                    html = `
+                        <div class="card-view" style="padding: 0;">
+                            <div style="padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+                                <h3 style="color: #1e293b;">Offer cần phê duyệt đặc biệt</h3>
+                                <button class="btn-primary" onclick="loadPendingOffers()">Làm mới dữ liệu</button>
+                            </div>
+                            <table class="data-table">
+                                <thead><tr><th>Ứng viên</th><th>Vị trí</th><th>Mức lương đề xuất</th><th>Mức trần quy định</th><th>Thao tác</th></tr></thead>
+                                <tbody id="offer_table_body">
+                                    <tr><td colspan="5" style="text-align:center">Đang tải dữ liệu từ Server...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    setTimeout(loadPendingOffers, 100);
+                    break;
 
                 // --- ADMIN ---
                 case 'Danh mục dùng chung':
@@ -984,6 +1055,132 @@
             } catch(e) {
                 container.innerHTML = `<div style="color:red; padding:20px;">Lỗi kết nối Backend.</div>`;
             }
+        }
+
+        // ========================== PHÊ DUYỆT OFFER ==========================
+        async function loadPendingOffers() {
+            const tbody = document.getElementById('offer_table_body');
+            if(!tbody) return;
+            const token = localStorage.getItem('accessToken');
+            try {
+                const response = await fetch('http://localhost:8080/api/offers/pending', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const result = await response.json();
+                if(response.ok && result.success) {
+                    tbody.innerHTML = '';
+                    if(result.data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Không có Offer nào cần duyệt.</td></tr>';
+                        return;
+                    }
+                    result.data.forEach(offer => {
+                        let offered = offer.offeredSalary ? offer.offeredSalary.toLocaleString() + 'đ' : 'N/A';
+                        let max = offer.maxSalary ? offer.maxSalary.toLocaleString() + 'đ' : 'N/A';
+                        tbody.innerHTML += `
+                            <tr>
+                                <td><strong>${offer.candidateName || 'N/A'}</strong></td>
+                                <td>${offer.jobTitle || 'N/A'}</td>
+                                <td>${offered}</td>
+                                <td>${max}</td>
+                                <td>
+                                    <button class="btn-primary" style="padding: 4px 10px; font-size:12px; background:#10b981;" onclick="processOffer(${offer.id}, true)">Phê duyệt</button>
+                                    <button class="btn-primary" style="padding: 4px 10px; font-size:12px; background:#ef4444;" onclick="processOffer(${offer.id}, false)">Từ chối</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">Lỗi: ${result.message}</td></tr>`;
+                }
+            } catch(e) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">Lỗi kết nối Backend.</td></tr>`;
+            }
+        }
+
+        async function processOffer(id, isApproved) {
+            const token = localStorage.getItem('accessToken');
+            try {
+                const response = await fetch(`http://localhost:8080/api/offers/${id}/approve?isApproved=${isApproved}`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    alert(result.message);
+                    loadPendingOffers();
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+            } catch (error) {
+                alert('Lỗi kết nối Backend.');
+            }
+        }
+
+        // ========================== CHATBOT LOGIC ==========================
+        function toggleChatbot() {
+            const win = document.getElementById('chatbotWindow');
+            win.classList.toggle('open');
+            if (win.classList.contains('open')) {
+                document.getElementById('chatbotInput').focus();
+            }
+        }
+
+        function handleChatbotKeyPress(e) {
+            if (e.key === 'Enter') sendChatbotMessage();
+        }
+
+        function sendChatbotMessage() {
+            const input = document.getElementById('chatbotInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+            
+            appendChatMessage(msg, 'user');
+            input.value = '';
+            
+            // Show typing indicator
+            const msgsContainer = document.getElementById('chatbotMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'chatbotTyping';
+            typingDiv.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+            msgsContainer.appendChild(typingDiv);
+            msgsContainer.scrollTop = msgsContainer.scrollHeight;
+            
+            // Simulate bot response after 1s
+            setTimeout(() => {
+                const typing = document.getElementById('chatbotTyping');
+                if (typing) typing.remove();
+                
+                let botReply = "Dạ, tôi chưa hiểu rõ ý của bạn. Bạn có thể hỏi tôi về các tính năng như Tuyển dụng, Lịch phỏng vấn, Duyệt Offer, hoặc thông tin liên hệ hỗ trợ ạ.";
+                const lowerMsg = msg.toLowerCase();
+                
+                if (lowerMsg.includes('xin chào') || lowerMsg.includes('hi') || lowerMsg.includes('hello')) {
+                    botReply = "Chào bạn ạ! Chúc bạn một ngày làm việc thật nhiều năng lượng. Tôi có thể hỗ trợ gì cho công việc của bạn hôm nay?";
+                } else if (lowerMsg.includes('chức năng') || lowerMsg.includes('làm được gì') || lowerMsg.includes('giúp gì')) {
+                    botReply = "Dạ, tôi có thể hướng dẫn bạn sử dụng các tính năng trên hệ thống như:\n- Tạo và duyệt Yêu cầu Tuyển dụng\n- Phân công Recruiter\n- Duyệt Offer vượt hạn mức\n- Quản lý lịch phỏng vấn\nBạn cần hỗ trợ cụ thể về tính năng nào ạ?";
+                } else if (lowerMsg.includes('hotline') || lowerMsg.includes('số điện thoại') || lowerMsg.includes('liên hệ') || lowerMsg.includes('hỗ trợ')) {
+                    botReply = "Dạ, bạn có thể liên hệ trực tiếp với bộ phận hỗ trợ kỹ thuật qua Hotline: 000887765414 ạ. Đội ngũ luôn sẵn lòng hỗ trợ bạn 24/7.";
+                } else if (lowerMsg.includes('cảm ơn') || lowerMsg.includes('thanks') || lowerMsg.includes('thank you')) {
+                    botReply = "Dạ không có gì ạ. Rất vui vì đã có thể giúp ích cho bạn. Nếu cần thêm hỗ trợ gì, bạn cứ nhắn tôi nhé!";
+                } else if (lowerMsg.includes('tuyển dụng') || lowerMsg.includes('yêu cầu')) {
+                    botReply = "Dạ, để xử lý Yêu cầu Tuyển dụng, bạn có thể vào mục 'Tạo Yêu cầu Tuyển dụng' nếu bạn là Trưởng bộ phận. Nếu bạn là HR, hãy vào 'Phân công Recruiter' ạ.";
+                } else if (lowerMsg.includes('duyệt') && lowerMsg.includes('offer')) {
+                    botReply = "Dạ, để duyệt Offer vượt hạn mức, bạn hãy chọn menu 'Duyệt Offer vượt hạn mức' ở thanh bên trái, sau đó nhấn 'Phê duyệt' hoặc 'Từ chối' nhé. Hệ thống sẽ tự động gửi email cho ứng viên.";
+                } else if (lowerMsg.includes('phỏng vấn')) {
+                    botReply = "Dạ, Lịch phỏng vấn được quản lý bởi Recruiter. Nếu bạn là Người phỏng vấn, hãy xem mục 'Xem lịch phỏng vấn' để lấy link Meet ạ.";
+                }
+                
+                appendChatMessage(botReply, 'bot');
+            }, 1000);
+        }
+
+        function appendChatMessage(text, sender) {
+            const container = document.getElementById('chatbotMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'chat-msg ' + sender;
+            msgDiv.textContent = text;
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
         }
 
     </script>
