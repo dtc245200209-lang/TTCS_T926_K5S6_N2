@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Quản lý tài khoản – Tuyển dụng nội bộ</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="users.css" />
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <a class="brand" href="dashboard.html">
+          <span class="brand-mark">
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+          </span>
+
+          <span>
+            <small>Hệ thống</small>
+            <strong>Tuyển dụng nội bộ</strong>
+          </span>
+        </a>
+
+        <div class="nav-label">QUẢN TRỊ</div>
+
+        <nav class="nav-list" aria-label="Điều hướng chính">
+          <a class="nav-link" href="dashboard.html">
+            <span class="nav-icon">▦</span>
+            Tổng quan
+          </a>
+
+          <a class="nav-link active" href="users.html">
+            <span class="nav-icon">♙</span>
+            Quản lý Tài khoản
+          </a>
+        </nav>
+
+        <div class="sidebar-note">
+          <span class="note-icon">i</span>
+          <p>Quản lý và tra cứu danh sách tài khoản trong hệ thống.</p>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <main class="main-area">
+        <header class="topbar">
+          <div class="breadcrumbs">
+            Quản trị hệ thống
+            <span>/</span>
+            <strong>Quản lý Tài khoản</strong>
+          </div>
+
+          <a class="back-button" href="dashboard.html"> ← Quay lại </a>
+        </header>
+
+        <section class="content">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">QUẢN TRỊ HỆ THỐNG</p>
+
+              <h1>Quản lý Tài khoản</h1>
+
+              <p class="subtitle">
+                Tìm kiếm, lọc và theo dõi danh sách tài khoản.
+              </p>
+            </div>
+          </div>
+
+          <!-- Bộ lọc -->
+          <section class="filter-panel">
+            <div class="filter-heading">
+              <div>
+                <h2>Tìm kiếm và lọc</h2>
+                <p>
+                  Tìm kiếm theo tên, email, phòng ban hoặc lọc theo vai trò và
+                  trạng thái.
+                </p>
+              </div>
+            </div>
+
+            <div class="filter-grid">
+              <div class="form-group search-group">
+                <label for="searchInput"> Tìm kiếm </label>
+
+                <input
+                  id="searchInput"
+                  type="text"
+                  placeholder="Nhập tên, email hoặc phòng ban..."
+                  autocomplete="off"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="roleFilter"> Vai trò </label>
+
+                <select id="roleFilter">
+                  <option value="">Tất cả vai trò</option>
+                  <option value="Admin">Admin</option>
+                  <option value="HR">HR</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Employee">Employee</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="statusFilter"> Trạng thái </label>
+
+                <select id="statusFilter">
+                  <option value="">Tất cả trạng thái</option>
+                  <option value="Đang hoạt động">Đang hoạt động</option>
+                  <option value="Không hoạt động">Không hoạt động</option>
+                </select>
+              </div>
+
+              <div class="filter-actions">
+                <button type="button" class="primary-button" id="searchButton">
+                  Tìm kiếm
+                </button>
+
+                <button type="button" class="quiet-button" id="resetButton">
+                  Đặt lại
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Danh sách tài khoản -->
+          <section class="table-panel">
+            <div class="table-heading">
+              <div>
+                <p class="eyebrow">DANH SÁCH TÀI KHOẢN</p>
+
+                <h2>Tài khoản hệ thống</h2>
+
+                <p id="resultInfo">Đang hiển thị 0 tài khoản</p>
+              </div>
+
+              <div class="page-size">
+                <span>Hiển thị</span>
+                <strong>20</strong>
+                <span>dòng/trang</span>
+              </div>
+            </div>
+
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Họ tên</th>
+                    <th>Email</th>
+                    <th>Phòng ban</th>
+                    <th>Vai trò</th>
+                    <th>Trạng thái</th>
+                  </tr>
+                </thead>
+
+                <tbody id="userTableBody">
+                  <!-- JavaScript render dữ liệu -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="empty-state" id="emptyState" hidden>
+              Không tìm thấy tài khoản phù hợp.
+            </div>
+
+            <!-- Phân trang -->
+            <div class="pagination-wrapper">
+              <span id="paginationInfo"> Trang 1 </span>
+
+              <div
+                class="pagination"
+                id="pagination"
+                aria-label="Phân trang"
+              ></div>
+            </div>
+          </section>
+
+          <footer>
+            Hệ thống Tuyển dụng Nội bộ
+            <span>•</span>
+            Quản lý tài khoản
+          </footer>
+        </section>
+      </main>
+    </div>
+
+    <script src="users.js"></script>
+  </body>
+</html>
