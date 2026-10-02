@@ -20,11 +20,11 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: YOUR_EMAIL@gmail.com
-    password: YOUR_APP_PASSWORD
+    username: dtc245200623@ictu.edu.vn
+    password: syykmjwlzwekgovs
     properties:
-      mail:
-        smtp:
+      mail: 
+        smtp: 
           auth: true
           starttls:
             enable: true

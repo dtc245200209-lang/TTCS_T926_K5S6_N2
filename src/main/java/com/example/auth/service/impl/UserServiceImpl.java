@@ -52,6 +52,14 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException("Không tìm thấy người dùng"));
         
+        // Prevent admin from revoking their own admin privileges
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && user.getUsername().equals(authentication.getName())) {
+            if (!roles.contains("ROLE_ADMIN") && !roles.contains("ADMIN")) {
+                throw new AppException("Quản trị viên không thể tự thu hồi quyền quản trị của chính mình");
+            }
+        }
+        
         user.setRoles(roles);
         // Force token invalidation by incrementing token version
         user.setTokenVersion(user.getTokenVersion() + 1); 
@@ -69,6 +77,12 @@ public class UserServiceImpl implements UserService {
             throw new AppException("Không thể khóa tài khoản quản trị viên gốc");
         }
         
+        // Ngăn quản trị viên tự khóa tài khoản của chính mình
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && user.getUsername().equals(authentication.getName())) {
+            throw new AppException("Bạn không thể tự khóa tài khoản của chính mình");
+        }
+        
         user.setIsLocked(!Boolean.TRUE.equals(user.getIsLocked()));
         if (Boolean.TRUE.equals(user.getIsLocked())) {
             user.setLockReason("Khóa bởi Quản trị viên");
@@ -78,6 +92,17 @@ public class UserServiceImpl implements UserService {
             user.setLockReason(null);
             user.setLockTime(null);
         }
+        
+        return mapToResponse(userRepository.save(user));
+    }
+
+    @Override
+    public UserResponse adminChangePassword(Long id, String newPassword) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException("Không tìm thấy người dùng"));
+        
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setTokenVersion(user.getTokenVersion() + 1);
         
         return mapToResponse(userRepository.save(user));
     }

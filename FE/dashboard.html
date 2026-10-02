@@ -916,7 +916,9 @@
                         ['Phạm Văn D', 'DevOps', 'Offer', 'Đã chốt lương']
                     ]); break;
                 case 'Đặt lịch phỏng vấn':
-                    html = renderForm('Lên lịch phỏng vấn', ['Chọn Ứng viên', 'Chọn Người phỏng vấn', 'Thời gian'], null, 'Gửi Lịch Mời'); break;
+                    html = '<div id="scheduleInterviewContainer">Đang tải biểu mẫu...</div>';
+                    setTimeout(loadScheduleInterviewForm, 0);
+                    break;
                 case 'Soạn Offer':
                     html = renderForm('Soạn Thư mời nhận việc', ['Ứng viên', 'Mức lương cơ bản', 'Phụ cấp'], 'Quyết định bổ nhiệm (PDF)', 'Gửi Offer'); break;
 
@@ -1471,6 +1473,87 @@
                 }
             } catch (e) {
                 container.innerHTML = `<div style="color:red; padding:20px;">Lỗi kết nối Backend.</div>`;
+            }
+        }
+
+        // ========================== ĐẶT LỊCH PHỎNG VẤN ==========================
+        async function loadScheduleInterviewForm() {
+            const container = document.getElementById('scheduleInterviewContainer');
+            if (!container) return;
+            const token = localStorage.getItem('accessToken');
+            try {
+                const response = await fetch('http://localhost:8080/api/applications', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await response.json();
+
+                let appOptions = '<option value="">-- Chọn Hồ sơ ứng viên --</option>';
+                if (response.ok && data.success) {
+                    data.data.forEach(app => {
+                        appOptions += `<option value="${app.id}">ID: ${app.id} | ${app.candidateName} - ${app.jobTitle}</option>`;
+                    });
+                }
+
+                container.innerHTML = `
+                    <div class="card-view">
+                        <h3 style="margin-bottom: 20px; color: #1e293b;">Lên lịch phỏng vấn</h3>
+                        <div class="form-group">
+                            <label>Chọn Hồ sơ Ứng viên</label>
+                            <select id="sched_appId" class="form-control" style="padding: 9px 16px;">
+                                ${appOptions}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tên đăng nhập Người phỏng vấn (Interviewer)</label>
+                            <input type="text" id="sched_interviewer" class="form-control" placeholder="Nhập username của người phỏng vấn...">
+                        </div>
+                        <div class="form-group">
+                            <label>Thời gian (Ví dụ: YYYY-MM-DDTHH:mm)</label>
+                            <input type="datetime-local" id="sched_time" class="form-control" style="padding: 9px 16px;">
+                        </div>
+                        <button class="btn-primary" onclick="submitInterviewSchedule()">Gửi Lịch Mời</button>
+                    </div>
+                `;
+            } catch (e) {
+                container.innerHTML = `<div style="color:red; padding:20px;">Lỗi kết nối Backend.</div>`;
+            }
+        }
+
+        async function submitInterviewSchedule() {
+            const appId = document.getElementById('sched_appId').value;
+            const interviewer = document.getElementById('sched_interviewer').value;
+            const timeStr = document.getElementById('sched_time').value;
+
+            if (!appId || !interviewer || !timeStr) {
+                alert('Vui lòng điền đầy đủ thông tin!');
+                return;
+            }
+
+            const token = localStorage.getItem('accessToken');
+            try {
+                const response = await fetch('http://localhost:8080/api/interviews', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        applicationId: appId,
+                        interviewerUsername: interviewer,
+                        scheduledAt: timeStr
+                    })
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    alert('Lên lịch phỏng vấn thành công!');
+                    document.getElementById('sched_appId').value = '';
+                    document.getElementById('sched_interviewer').value = '';
+                    document.getElementById('sched_time').value = '';
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+            } catch (error) {
+                alert('Lỗi kết nối Backend.');
             }
         }
 

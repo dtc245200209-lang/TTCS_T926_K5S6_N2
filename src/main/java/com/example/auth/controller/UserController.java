@@ -15,6 +15,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class UserController {
 
     private final UserService userService;
@@ -44,5 +45,16 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<UserResponse>> toggleLockUser(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success("Thay đổi trạng thái khóa tài khoản thành công", userService.toggleLockUser(id)));
+    }
+    @PutMapping("/{id}/password")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<UserResponse>> adminChangePassword(
+            @PathVariable Long id, 
+            @RequestBody java.util.Map<String, String> request) {
+        String newPassword = request.get("newPassword");
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Mật khẩu mới không được để trống"));
+        }
+        return ResponseEntity.ok(ApiResponse.success("Đổi mật khẩu thành công", userService.adminChangePassword(id, newPassword)));
     }
 }

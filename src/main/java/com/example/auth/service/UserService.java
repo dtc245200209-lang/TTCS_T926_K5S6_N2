@@ -11,4 +11,5 @@ public interface UserService {
     UserResponse createUser(UserRequest request);
     UserResponse updateUserRoles(Long id, Set<String> roles);
     UserResponse toggleLockUser(Long id);
+    UserResponse adminChangePassword(Long id, String newPassword);
 }
